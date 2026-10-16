@@ -1,0 +1,5 @@
+# Minimal dependencies for the deployed dashboard (Streamlit Community Cloud)
+streamlit
+folium
+streamlit-folium
+pandas

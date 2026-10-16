@@ -1,0 +1,19 @@
+# Credentials
+.env
+
+# ACLED licence: raw data and any file containing event notes are not redistributed
+data/raw/
+data/processed/acled_chad_labeled.csv
+data/processed/validation_sample.csv
+data/processed/validation_annotated.csv
+
+# Local Word drafts
+docs/*.docx
+~$*
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.ipynb_checkpoints/
+.pytest_cache/
