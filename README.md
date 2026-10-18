@@ -18,11 +18,31 @@ presents the results to support humanitarian and local decision-makers.
 | 5. Application database | `scripts/init_db.py` | `data/app.db` |
 | 6. Satellite indicators (Google Earth Engine) | `scripts/gee_extract.py` | `data/processed/satellite_features.csv` |
 | 7. Feature table (no look-ahead) | `scripts/build_features.py` | `data/processed/features.csv` |
-| 8. Training, evaluation, SHAP, predictions | `scripts/train_models.py --unit month` and `--unit quarter` | `reports/metrics_<unit>.csv`, predictions in `data/app.db` |
+| 8. Training, evaluation, SHAP, predictions | `scripts/train_models.py` (see below) | `reports/metrics_<mode>_<unit>.csv`, predictions in `data/app.db` |
 | 9. Dashboard | `streamlit run app/app.py` | — |
+
+Step 8 is run four times:
+
+```
+python scripts/train_models.py --mode research --unit quarter
+python scripts/train_models.py --mode research --unit month
+python scripts/train_models.py --mode operational --unit quarter --fixed-model logreg_OB
+python scripts/train_models.py --mode operational --unit month
+```
 
 Steps 4 to 8 can be re-run in order at any time. Step 6 requires a Google Earth Engine account;
 until it is run, only the conflict-history model (feature set A) is trained.
+
+## Notebook
+
+`notebooks/capstone_pipeline.ipynb` contains the whole pipeline in one place, with an
+explanation and the outputs (tables, figures, test results) for each step. It is generated
+from the scripts, which remain the reference implementation:
+
+```
+python scripts/make_notebook.py
+python -m nbconvert --to notebook --execute --inplace notebooks/capstone_pipeline.ipynb
+```
 
 ## Setup
 
@@ -37,8 +57,8 @@ earthengine authenticate    # once, for step 6
 ```
 python -m pytest -v
 ```
-12 automated tests check label and panel consistency, the absence of look-ahead in every
-feature (history and satellite), the absence of outcome leakage, the validity of the stored
+14 automated tests check label and panel consistency, the absence of look-ahead in every
+feature (history, delayed history and satellite), the absence of outcome leakage, the validity of the stored
 predictions, and that the dashboard runs without errors.
 
 ## Deployment (Streamlit Community Cloud)
@@ -54,8 +74,16 @@ predictions, and that the dashboard runs without errors.
 - **Unit:** 26 departments x months, January 2019 – September 2025 (2018 used only as burn-in).
   Two horizons are evaluated: next month, and next quarter (risk of at least one event in the
   three months starting at the forecast date).
-- **Feature sets:** A = conflict history; B = A + southern satellite indicators;
-  C = B + conditions in the northern herd departure zones.
+- **Two models, two purposes.**
+  - *Research model* — conflict history up to the previous month. Feature sets: A = conflict
+    history; B = A + southern satellite indicators; C = B + northern herd-departure zones.
+    It answers the research question: do satellite indicators add information?
+  - *Operational model* — only what is really available when a forecast is issued: ACLED
+    Research-tier data are published with a 12-month delay, so conflict history stops at
+    month t-13; satellite data run up to the previous month. Feature sets: OA = lagged history
+    + season; OB = OA + satellite. It produces the dashboard's current outlook (logistic
+    regression OB, fixed by design because the outlook must react to current conditions and
+    automatic selection was unstable with so few positive cases).
 - **Validation:** model selection on 2019–2023 by rolling-origin validation (validate on 2021,
   2022, 2023), single evaluation on the held-out test period 2024–Sept 2025.
   Every feature uses only information available before the predicted month.

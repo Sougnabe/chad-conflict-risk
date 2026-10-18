@@ -1,0 +1,5 @@
+{
+  "auto_selected": "xgboost_OA",
+  "used_for_predictions": "logreg_OB",
+  "fixed_by_design": true
+}

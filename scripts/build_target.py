@@ -87,13 +87,13 @@ print(f"Keyword precision: {precision:.0%} | Recall: {recall:.0%}")
 # Never overwrite a sample that has already been annotated.
 if VALIDATION.exists():
     print(f"\n{VALIDATION.name} already exists: not regenerated (annotations preserved).")
-    raise SystemExit
-parts = [
-    df[df["label"] == "FH"].sample(30, random_state=1),
-    df[df["label"] == "AMB"].sample(min(15, (df["label"] == "AMB").sum()), random_state=1),
-    df[(df["label"] == "NO") & df["keyword_hit"]].sample(15, random_state=1),
-]
-sample = pd.concat(parts).sample(frac=1, random_state=1)
-sample = sample[["event_id_cnty", "event_date", "admin1", "notes"]].assign(author_label="")
-sample.to_csv(VALIDATION, index=False)
-print(f"\nValidation sample (60 events, labels hidden): {VALIDATION}")
+else:
+    parts = [
+        df[df["label"] == "FH"].sample(30, random_state=1),
+        df[df["label"] == "AMB"].sample(min(15, (df["label"] == "AMB").sum()), random_state=1),
+        df[(df["label"] == "NO") & df["keyword_hit"]].sample(15, random_state=1),
+    ]
+    sample = pd.concat(parts).sample(frac=1, random_state=1)
+    sample = sample[["event_id_cnty", "event_date", "admin1", "notes"]].assign(author_label="")
+    sample.to_csv(VALIDATION, index=False)
+    print(f"\nValidation sample (60 events, labels hidden): {VALIDATION}")

@@ -63,8 +63,8 @@ def test_panel_targets_follow_counts(panel):
 
 def test_panel_keeps_all_southern_conflicts(panel):
     ev = pd.read_csv(PROC / "acled_chad_labeled.csv", parse_dates=["event_date"])
-    # Panel period: 2018-01 to 2025-09 (an event on 2025-10-02 is outside it by design)
-    in_period = ev["event_date"].between("2018-01-01", "2025-09-30")
+    # Panel period: 2017-01 to 2025-09 (an event on 2025-10-02 is outside it by design)
+    in_period = ev["event_date"].between(panel["ym"].min() + "-01", "2025-09-30")
     south_fh = ev[(ev["target_fh"] == 1) & ev["is_south"] & in_period]
     assert panel["n_fh"].sum() == len(south_fh)
 
@@ -76,8 +76,29 @@ def test_history_features_use_only_past_months(features):
         h1 = g["h_fh_1m"].to_numpy()
         h12 = g["h_fh_12m"].to_numpy()
         for t in range(13, len(g)):
+            if np.isnan(h1[t]):  # after the conflict data: empty by design (tested below)
+                continue
             assert h1[t] == n[t - 1]
             assert h12[t] == n[t - 12:t].sum()
+
+
+def test_operational_features_use_only_conflicts_13_months_old(features):
+    for _, g in features.groupby("dept_id"):
+        n = g["n_fh"].to_numpy()
+        o12 = g["o_fh_12m"].to_numpy()
+        known = ~np.isnan(n)
+        for t in range(25, len(g)):
+            window = n[t - 24:t - 12]  # months t-24 .. t-13
+            if known[t - 24:t - 12].all():
+                assert o12[t] == window.sum()
+
+
+def test_research_history_is_empty_without_recent_conflict_data(features):
+    data_end = features.loc[features["n_fh"].notna(), "ym"].max()
+    after = features[features["ym"] > data_end]
+    research_month = (pd.Period(data_end, freq="M") + 1).strftime("%Y-%m")
+    assert after.loc[after["ym"] > research_month, "h_fh_12m"].isna().all()
+    assert after["o_fh_12m"].notna().all()
 
 
 def test_satellite_features_are_lagged_one_month(features):
@@ -91,16 +112,17 @@ def test_satellite_features_are_lagged_one_month(features):
 
 
 def test_no_outcome_column_is_a_feature(features):
-    feature_cols = [c for c in features.columns if c.startswith(("h_", "south_", "north_"))]
+    feature_cols = [c for c in features.columns
+                    if c.startswith(("h_", "o_", "south_", "north_"))]
     assert not OUTCOMES & set(feature_cols)
 
 
-def test_forecast_row_has_no_target(features):
-    last = features["ym"].max()
-    future = features[features["ym"] == last]
-    assert len(future) == 26
+def test_forecast_rows_have_no_target(features):
+    data_end = features.loc[features["n_fh"].notna(), "ym"].max()
+    future = features[features["ym"] > data_end]
+    assert len(future) % 26 == 0
     assert future["y_fh"].isna().all()
-    assert future["h_fh_1m"].notna().all()
+    assert features[features["ym"] == features["ym"].max()]["south_rain_mm"].notna().all()
 
 
 # ---------- Database and predictions ----------
@@ -110,15 +132,21 @@ def test_database_tables_and_predictions():
         assert {"departments", "panel", "features", "predictions"} <= tables
         preds = pd.read_sql("SELECT * FROM predictions", con)
     assert preds["risk"].between(0, 1).all()
-    for unit in ("month", "quarter"):
-        sub = preds[preds["model"].str.contains(unit)]
-        assert not sub.empty, f"no {unit} predictions"
-        assert (sub[sub["model"].str.endswith("_forecast")]["dept_id"].nunique()) == 26
+    for tag in ("research_month", "research_quarter", "operational_month",
+                "operational_quarter"):
+        sub = preds[preds["model"].str.contains(tag)]
+        assert not sub.empty, f"no {tag} predictions"
+        fc = sub[sub["model"].str.endswith("_forecast")]
+        assert fc["dept_id"].nunique() == 26 and fc["ym"].nunique() == 1
+    # The operational outlook is issued after the end of the conflict data
+    ops_fc = preds[preds["model"].str.contains("operational_quarter_forecast")]
+    assert ops_fc["ym"].iloc[0] > "2025-10"
 
 
 def test_metrics_reports_exist():
-    for unit in ("month", "quarter"):
-        m = pd.read_csv(ROOT / "reports" / f"metrics_{unit}.csv")
+    for tag in ("research_month", "research_quarter", "operational_month",
+                "operational_quarter"):
+        m = pd.read_csv(ROOT / "reports" / f"metrics_{tag}.csv")
         assert "rule_history_12m" in set(m["model"])
         assert m["pr_auc"].between(0, 1).all()
 
@@ -129,5 +157,5 @@ def test_dashboard_runs_without_errors():
 
     at = AppTest.from_file(str(ROOT / "app" / "app.py"), default_timeout=180).run()
     assert not at.exception
-    assert [t.label for t in at.tabs] == ["Observed conflicts", "Predicted risk",
-                                          "About the model"]
+    assert [t.label for t in at.tabs] == ["Current outlook", "Replay 2024–2025",
+                                          "Observed conflicts", "About the models"]

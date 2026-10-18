@@ -27,9 +27,9 @@ SOUTH_ADM1 = [
     "Tandjilé", "Mayo-Kebbi Est", "Mayo-Kebbi Ouest",
 ]
 # ACLED coverage of Chad is poor before 2019; data available up to September 2025.
-# 2018 is only a burn-in year for the history features (12-month lags);
+# 2017-2018 are only burn-in years for the history features (up to 24-month lags);
 # modelling and the app start in 2019.
-START, END = "2018-01", "2025-09"
+START, END = "2017-01", "2025-09"
 
 adm1 = gpd.read_file(EXT / "tcd_adm1.geojson")[["shapeName", "geometry"]]
 adm2 = gpd.read_file(EXT / "tcd_adm2.geojson")[["shapeName", "shapeID", "geometry"]]

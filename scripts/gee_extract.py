@@ -6,7 +6,7 @@ Prerequisites:
     2. In .env: EE_PROJECT=your-cloud-project-id
     3. Once: earthengine authenticate
 
-Output variables (one row per department x month, 2018-01 -> 2025-09):
+Output variables (one row per department x month, 2018-01 -> END_MONTH):
     South (per department)
         south_ndvi_crop        mean NDVI over cropland (MODIS MOD13Q1)
         south_ndvi_crop_anom   deviation from the 2003-2017 mean of the same calendar month
@@ -21,6 +21,10 @@ Output variables (one row per department x month, 2018-01 -> 2025-09):
         north_rain_anom        monthly rainfall anomaly
 
 The one-month lag (no look-ahead) is applied afterwards in build_features.py.
+
+Incremental: if satellite_features.csv already exists, only the missing months up to
+END_MONTH are extracted and appended. Set END_MONTH to the last complete month available
+in both CHIRPS and MODIS.
 
 Usage: python scripts/gee_extract.py
 """
@@ -46,7 +50,13 @@ if not project:
 ee.Initialize(project=project)
 
 NORTH_ADM1 = ["Batha", "Guéra", "Salamat", "Ouaddaï"]
-MONTHS = pd.period_range("2017-12", "2025-09", freq="M")
+END_MONTH = "2026-09"
+existing = pd.read_csv(OUT) if OUT.exists() else None
+first = (pd.Period(existing["ym"].max(), freq="M") + 1) if existing is not None else pd.Period("2017-12", freq="M")
+MONTHS = pd.period_range(first, END_MONTH, freq="M")
+print(f"Months to extract: {len(MONTHS)} ({MONTHS[0] if len(MONTHS) else None} -> {END_MONTH})")
+if len(MONTHS) == 0:
+    sys.exit("Nothing to extract: satellite_features.csv is already up to date.")
 SCALE_NDVI = 250
 SCALE_RAIN = 5566
 
@@ -127,6 +137,8 @@ for p in MONTHS:
     print(f"{p} done")
 
 sat = pd.DataFrame(rows).merge(static_df, on="dept_id")
+if existing is not None:
+    sat = pd.concat([existing.drop(columns=["south_ndvi_crop_delta"]), sat], ignore_index=True)
 sat = sat.sort_values(["dept_id", "ym"])
 sat["south_ndvi_crop_delta"] = sat.groupby("dept_id")["south_ndvi_crop"].diff()
 sat = sat[sat["ym"] >= "2018-01"]
