@@ -78,11 +78,18 @@ class RiskRepository:
             con.executescript(SCHEMA)
 
     # ---------- writing ----------
-    def replace_departments(self, departments) -> None:
-        """`departments`: GeoDataFrame with dept_id, department, province, geometry."""
+    def replace_departments(self, departments, map_tolerance: float = 0.002) -> None:
+        """`departments`: GeoDataFrame with dept_id, department, province, geometry.
+
+        Outlines are simplified for display (tolerance in degrees, about 200 m at 0.002):
+        invisible at the dashboard's zoom level, but it divides the map payload sent to the
+        browser. The full outlines remain in data/processed/south_departments.geojson.
+        """
         import geopandas as gpd  # only needed when writing
-        rows = [(r.dept_id, r.department, r.province, gpd.GeoSeries([r.geometry]).to_json())
-                for r in departments.itertuples()]
+        shapes = departments.geometry.simplify(map_tolerance, preserve_topology=True) \
+            if map_tolerance else departments.geometry
+        rows = [(r.dept_id, r.department, r.province, gpd.GeoSeries([shape]).to_json())
+                for r, shape in zip(departments.itertuples(), shapes)]
         with self._connect() as con:
             con.execute("DELETE FROM departments")
             con.executemany("INSERT INTO departments VALUES (?, ?, ?, ?)", rows)

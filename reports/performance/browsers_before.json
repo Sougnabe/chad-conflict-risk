@@ -1,0 +1,57 @@
+[
+  {
+    "scenario": "Chromium desktop",
+    "engine": "chromium",
+    "content_s": 2.9,
+    "map_s": 8.8,
+    "interactions": true,
+    "console_errors": 0,
+    "js_heap_mb": 37.0,
+    "screenshot": "reports/performance/screenshots/chromium_desktop.png"
+  },
+  {
+    "scenario": "Firefox desktop",
+    "engine": "firefox",
+    "content_s": 2.9,
+    "map_s": 8.7,
+    "interactions": true,
+    "console_errors": 0,
+    "js_heap_mb": null,
+    "screenshot": "reports/performance/screenshots/firefox_desktop.png"
+  },
+  {
+    "scenario": "WebKit desktop (Safari engine)",
+    "engine": "webkit",
+    "content_s": 1.9,
+    "map_s": 4.6,
+    "interactions": true,
+    "console_errors": 0,
+    "js_heap_mb": null,
+    "screenshot": "reports/performance/screenshots/webkit_desktop.png"
+  },
+  {
+    "scenario": "Chromium mobile (Pixel 5)",
+    "engine": "chromium",
+    "error": "Locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for get_by_text(\"Fran\u00e7ais\").first\n    - locator resolved to <p>Fran\u00e7ais</p>\n  - attempting click action\n    2 \u00d7 waiting for element to be"
+  },
+  {
+    "scenario": "WebKit mobile (iPhone 13)",
+    "engine": "webkit",
+    "error": "Locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for get_by_text(\"Fran\u00e7ais\").first\n    - locator resolved to <p>Fran\u00e7ais</p>\n  - attempting click action\n    2 \u00d7 waiting for element to be"
+  },
+  {
+    "scenario": "Firefox small screen (390 px)",
+    "engine": "firefox",
+    "error": "Locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for get_by_text(\"Fran\u00e7ais\").first\n    - locator resolved to <p>Fran\u00e7ais</p>\n  - attempting click action\n    2 \u00d7 waiting for element to be"
+  },
+  {
+    "scenario": "Chromium low-end (CPU x4, Fast 3G)",
+    "engine": "chromium",
+    "content_s": 14.5,
+    "map_s": 32.6,
+    "interactions": true,
+    "console_errors": 0,
+    "js_heap_mb": 26.4,
+    "screenshot": "reports/performance/screenshots/chromium_low-end.png"
+  }
+]

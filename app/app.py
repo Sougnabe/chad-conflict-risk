@@ -10,6 +10,7 @@ Run: streamlit run app/app.py
 """
 
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -27,14 +28,20 @@ from components import (PRIORITY_N, department_map, quarter_months,  # noqa: E40
 from i18n import Translator  # noqa: E402
 
 REPORTS = ROOT / "reports"
+DATABASE = Path(os.environ.get("CHADRISK_DB", ROOT / "data" / "app.db"))  # overridable
 OPS = "operational_quarter"
 
 
 # ---------------- data access ----------------
 @st.cache_data
-def load_data():
-    repo = RiskRepository(ROOT / "data" / "app.db")
-    return repo.departments(), repo.panel(), repo.predictions(), repo.explanations(OPS)
+def load_data(database: str):
+    """Loaded once and cached (per database path): later interactions reuse parsed data."""
+    repo = RiskRepository(Path(database))
+    depts = repo.departments()
+    # parse the GeoJSON outlines once, not at every map rendering
+    depts["geom"] = [json.loads(g)["features"][0]["geometry"] for g in depts["geometry"]]
+    return (depts.drop(columns="geometry"), repo.panel(), repo.predictions(),
+            repo.explanations(OPS))
 
 
 def read_report(name: str):
@@ -249,11 +256,15 @@ def tab_about(t):
 # ---------------- page ----------------
 def main():
     st.set_page_config(page_title="Farmer-Herder Conflict Risk - Southern Chad", layout="wide")
-    language = st.sidebar.radio("Language / Langue", ["English", "Français"])
+    # In the page, not the sidebar: Streamlit hides the sidebar on phones (found by the
+    # mobile browser tests), and field users often work on mobile.
+    title, switch = st.columns([5, 2])
+    language = switch.radio("Language / Langue", ["English", "Français"], horizontal=True,
+                            key="language")
     t = Translator("fr" if language == "Français" else "en")
-    st.title(t("title"))
+    title.title(t("title"))
     try:
-        depts, panel, predictions, explanations = load_data()
+        depts, panel, predictions, explanations = load_data(str(DATABASE))
     except DatabaseNotFoundError as error:
         st.error(f"{error}")
         st.stop()
@@ -270,16 +281,22 @@ def main():
         st.caption(t("caption", sat=t.month(meta["satellite_data_end"], long=True),
                      conf=t.month(data_end, long=True)))
 
-    tabs = st.tabs(t("tabs"))
-    with tabs[0]:
+    # Only the selected page is computed (Streamlit tabs would compute all five, and their
+    # three maps, at every interaction).
+    pages = t("tabs")
+    # the page is stored as a number, so it survives a change of language
+    page = st.radio("page", range(len(pages)), format_func=lambda i: pages[i],
+                    horizontal=True, key="page", label_visibility="collapsed")
+    st.divider()
+    if page == 0:
         tab_outlook(t, depts, forecast, explanations, meta, data_end)
-    with tabs[1]:
+    elif page == 1:
         tab_replay(t, depts, panel, replay)
-    with tabs[2]:
+    elif page == 2:
         tab_findings(t)
-    with tabs[3]:
+    elif page == 3:
         tab_observed(t, depts, panel, data_end)
-    with tabs[4]:
+    else:
         tab_about(t)
     st.caption(t("ethics"))
 

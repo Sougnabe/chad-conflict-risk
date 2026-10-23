@@ -1,7 +1,5 @@
 """Reusable dashboard building blocks: department map and risk ranking."""
 
-import json
-
 import folium
 import pandas as pd
 from streamlit_folium import st_folium
@@ -14,12 +12,13 @@ def department_map(frame: pd.DataFrame, value_col: str, legend: str, tooltip_nam
                    fmt: str = "{:.0f}", key: str | None = None):
     """Choropleth of one value per department, with a hover tooltip.
 
-    `frame` needs dept_id, department, province, geometry (GeoJSON text) and `value_col`.
+    `frame` needs dept_id, department, province, geom (parsed GeoJSON geometry) and
+    `value_col`.
     """
     features = [{
         "type": "Feature",
         "id": r.dept_id,
-        "geometry": json.loads(r.geometry)["features"][0]["geometry"],
+        "geometry": r.geom,
         "properties": {"department": r.department, "province": r.province,
                        "value": fmt.format(getattr(r, value_col))},
     } for r in frame.itertuples()]

@@ -7,55 +7,55 @@
     "logical_cpus": 8,
     "ram_gb": 17.0,
     "database_kb": 876.5,
-    "map_geometry_kb": 0.0
+    "map_geometry_kb": 140.0
   },
   "stages": [
     {
       "stage": "Labels and target (1,593 events)",
-      "seconds": 0.292,
-      "peak_memory_mb": 2.2,
+      "seconds": 0.09,
+      "peak_memory_mb": 194.8,
       "runs": 3
     },
     {
       "stage": "Spatial join + panel (26 depts x 105 months)",
-      "seconds": 0.35,
-      "peak_memory_mb": 2.9,
+      "seconds": 0.03,
+      "peak_memory_mb": 206.7,
       "runs": 3
     },
     {
       "stage": "Feature table (31 features, 3,068 rows)",
-      "seconds": 3.674,
-      "peak_memory_mb": 4.4,
+      "seconds": 0.356,
+      "peak_memory_mb": 210.2,
       "runs": 3
     },
     {
       "stage": "Experiment operational/quarter (selection + evaluation)",
-      "seconds": 131.164,
-      "peak_memory_mb": 3.2,
+      "seconds": 25.532,
+      "peak_memory_mb": 216.3,
       "runs": 1
     },
     {
       "stage": "Experiment research/month (selection + evaluation)",
-      "seconds": 157.226,
-      "peak_memory_mb": 4.2,
+      "seconds": 82.48,
+      "peak_memory_mb": 219.5,
       "runs": 1
     },
     {
       "stage": "Dashboard: cold start (first render)",
-      "seconds": 43.557,
-      "peak_memory_mb": 55.4,
+      "seconds": 7.771,
+      "peak_memory_mb": 293.4,
       "runs": 1
     },
     {
       "stage": "Dashboard: warm rerun (cached data)",
-      "seconds": 3.838,
-      "peak_memory_mb": 6.8,
+      "seconds": 1.199,
+      "peak_memory_mb": 305.4,
       "runs": 5
     },
     {
       "stage": "Dashboard: switch to French",
-      "seconds": 5.289,
-      "peak_memory_mb": 8.3,
+      "seconds": 1.396,
+      "peak_memory_mb": 307.7,
       "runs": 1
     }
   ]

@@ -161,15 +161,77 @@ def test_priority_levels_and_outlook_metadata():
     assert meta["forecast_start"] > meta["satellite_data_end"] > meta["conflict_data_end"]
 
 
-# ---------- Dashboard ----------
-def test_dashboard_runs_in_english_and_french():
-    from streamlit.testing.v1 import AppTest
+# ---------- Dashboard: functional tests with different inputs ----------
+from streamlit.testing.v1 import AppTest  # noqa: E402
 
-    at = AppTest.from_file(str(ROOT / "app" / "app.py"), default_timeout=180).run()
-    assert not at.exception
-    assert [t.label for t in at.tabs] == ["Current outlook", "Replay 2024–2025", "Findings",
-                                          "Observed conflicts", "About the models"]
-    assert any("Research question" in m.value for m in at.markdown)
-    at.sidebar.radio[0].set_value("Français").run()
-    assert not at.exception
-    assert [t.label for t in at.tabs][0] == "Perspectives actuelles"
+APP = str(ROOT / "app" / "app.py")
+PAGES_EN = ["Current outlook", "Replay 2024–2025", "Findings", "Observed conflicts",
+            "About the models"]
+
+
+@pytest.fixture
+def app():
+    return AppTest.from_file(APP, default_timeout=180).run()
+
+
+@pytest.mark.parametrize("language", ["English", "Français"])
+def test_every_page_renders_in_both_languages(app, language):
+    app.radio(key="language").set_value(language).run()
+    for page in range(len(PAGES_EN)):
+        app.radio(key="page").set_value(page).run()   # fresh element after each rerun
+        assert not app.exception, f"{language} / page {page}"
+    assert (app.radio(key="page").options == PAGES_EN) == (language == "English")
+
+
+def test_page_survives_a_change_of_language(app):
+    app.radio(key="page").set_value(2).run()
+    app.radio(key="language").set_value("Français").run()
+    assert not app.exception
+    assert app.radio(key="page").value == 2
+
+
+def test_findings_page_reads_the_results(app):
+    app.radio(key="page").set_value(PAGES_EN.index("Findings")).run()
+    text = " ".join(m.value for m in app.markdown)
+    assert "Research question" in text and "0.214" in text
+
+
+def test_every_department_has_an_explanation(app):
+    select = app.selectbox[0]
+    for department in select.options:
+        select.set_value(department).run()
+        assert not app.exception
+        assert len(app.dataframe[1].value) >= 3, department
+
+
+def test_every_replay_quarter(app):
+    app.radio(key="page").set_value(1).run()
+    with sqlite3.connect(DB) as con:
+        quarters = sorted(r[0] for r in con.execute(
+            "SELECT DISTINCT ym FROM predictions WHERE model LIKE '%operational_quarter_test'"))
+    assert len(quarters) == 7
+    for quarter in quarters:
+        app.select_slider[0].set_value(quarter).run()
+        assert not app.exception
+        flagged = int(app.metric[1].value)
+        assert 0 <= flagged <= int(app.metric[0].value)
+
+
+def test_observed_page_edge_inputs(app):
+    app.radio(key="page").set_value(3).run()
+    app.multiselect[0].set_value([]).run()                  # no province selected
+    assert not app.exception
+    assert app.metric[0].value == "0"
+    app.multiselect[0].set_value(["Mandoul"]).run()         # one province
+    app.select_slider[0].set_value(("2024-01", "2024-01")).run()  # a single month
+    assert not app.exception
+    definition = [r for r in app.radio if r.key not in ("page", "language")][-1]
+    definition.set_value(definition.options[1]).run()       # broad definition
+    assert not app.exception
+
+
+def test_missing_database_shows_an_error_instead_of_crashing(tmp_path, monkeypatch):
+    monkeypatch.setenv("CHADRISK_DB", str(tmp_path / "absent.db"))
+    app = AppTest.from_file(APP, default_timeout=180).run()
+    assert not app.exception
+    assert app.error and "not found" in app.error[0].value
