@@ -1,5 +1,5 @@
 {
-  "auto_selected": "xgboost_B",
-  "used_for_predictions": "xgboost_B",
+  "auto_selected": "logreg_C",
+  "used_for_predictions": "logreg_C",
   "fixed_by_design": false
 }

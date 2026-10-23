@@ -1,0 +1,62 @@
+{
+  "environment": {
+    "os": "Windows-11-10.0.26300-SP0",
+    "python": "3.13.2",
+    "processor": "Intel64 Family 6 Model 142 Stepping 12, GenuineIntel",
+    "cpu_cores": 4,
+    "logical_cpus": 8,
+    "ram_gb": 17.0,
+    "database_kb": 876.5,
+    "map_geometry_kb": 0.0
+  },
+  "stages": [
+    {
+      "stage": "Labels and target (1,593 events)",
+      "seconds": 0.292,
+      "peak_memory_mb": 2.2,
+      "runs": 3
+    },
+    {
+      "stage": "Spatial join + panel (26 depts x 105 months)",
+      "seconds": 0.35,
+      "peak_memory_mb": 2.9,
+      "runs": 3
+    },
+    {
+      "stage": "Feature table (31 features, 3,068 rows)",
+      "seconds": 3.674,
+      "peak_memory_mb": 4.4,
+      "runs": 3
+    },
+    {
+      "stage": "Experiment operational/quarter (selection + evaluation)",
+      "seconds": 131.164,
+      "peak_memory_mb": 3.2,
+      "runs": 1
+    },
+    {
+      "stage": "Experiment research/month (selection + evaluation)",
+      "seconds": 157.226,
+      "peak_memory_mb": 4.2,
+      "runs": 1
+    },
+    {
+      "stage": "Dashboard: cold start (first render)",
+      "seconds": 43.557,
+      "peak_memory_mb": 55.4,
+      "runs": 1
+    },
+    {
+      "stage": "Dashboard: warm rerun (cached data)",
+      "seconds": 3.838,
+      "peak_memory_mb": 6.8,
+      "runs": 5
+    },
+    {
+      "stage": "Dashboard: switch to French",
+      "seconds": 5.289,
+      "peak_memory_mb": 8.3,
+      "runs": 1
+    }
+  ]
+}

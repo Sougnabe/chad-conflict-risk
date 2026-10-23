@@ -23,7 +23,10 @@ class XGBoostRiskModel(RiskModel):
             max_depth=max_depth, n_estimators=n_estimators, learning_rate=0.05,
             min_child_weight=min_child_weight, subsample=0.8, colsample_bytree=0.8,
             scale_pos_weight=scale_pos_weight, eval_metric="logloss", random_state=SEED,
-            n_jobs=4)
+            # One thread per model: XGBoost results depend on the thread count (order of
+            # floating-point sums), so a fixed single thread makes them identical on every
+            # machine. Parallelism is applied across candidates instead (selection.py).
+            n_jobs=1)
 
     @classmethod
     def candidates(cls, y: pd.Series) -> list["XGBoostRiskModel"]:

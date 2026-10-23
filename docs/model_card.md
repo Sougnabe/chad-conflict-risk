@@ -63,9 +63,11 @@ conflict in **20%** of department-quarters (14 of 70), against **5%** for the ot
 112), and they contained **70%** of the department-quarters with a conflict. Ranks 1–5 did not
 do better than ranks 6–10 (20% each), so the dashboard shows two levels only.
 
-**Model choice.** The automatic selection on validation favoured XGBoost in every run, which
-then underperformed out of sample: with 5 to 9 positive cases per validation year, validation
-cannot reliably separate models. The dashboard model was fixed by design (it must react to
+**Model choice.** The automatic selection on validation favoured XGBoost in 3 of the 4 runs
+(including the operational quarterly run, where it chose `xgboost_OA`, a model without any
+satellite feature), and XGBoost then underperformed logistic regression out of sample in the
+quarterly runs: with 5 to 9 positive cases per validation year, validation cannot reliably
+separate models. The dashboard model was fixed by design (it must react to
 current conditions, hence satellite features; logistic regression is the most stable and
 interpretable option). This decision was taken after the test results were known and is
 reported as such; all models are shown in `reports/metrics_*.csv`.

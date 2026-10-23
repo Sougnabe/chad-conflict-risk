@@ -1,8 +1,8 @@
 {
   "mode": "operational",
   "unit": "month",
-  "model": "xgboost_OA",
-  "issued_on": "2026-10-18",
+  "model": "xgboost_OB",
+  "issued_on": "2026-10-23",
   "forecast_start": "2026-10",
   "forecast_end": "2026-10",
   "conflict_data_end": "2025-09",

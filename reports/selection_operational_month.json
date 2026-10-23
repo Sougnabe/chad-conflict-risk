@@ -1,5 +1,5 @@
 {
-  "auto_selected": "xgboost_OA",
-  "used_for_predictions": "xgboost_OA",
+  "auto_selected": "xgboost_OB",
+  "used_for_predictions": "xgboost_OB",
   "fixed_by_design": false
 }
