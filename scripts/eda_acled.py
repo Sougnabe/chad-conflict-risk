@@ -1,22 +1,22 @@
 """
-Exploratory analysis of ACLED data for Chad (2015-2025), using the validated labels.
+Step 3 — Exploratory analysis of ACLED data for Chad (2015-2025), using the validated labels.
 Goal: document the concentration, trend and seasonality of farmer-herder conflict
 in the south (figures for the report).
 
 Usage: python scripts/build_target.py, then python scripts/eda_acled.py
 """
 
-from pathlib import Path
-
+import _bootstrap  # noqa: F401
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-import pandas as pd
+import matplotlib.pyplot as plt  # noqa: E402
+import pandas as pd  # noqa: E402
 
-ROOT = Path(__file__).resolve().parents[1]
-DATA = ROOT / "data" / "processed" / "acled_chad_labeled.csv"
-FIG_DIR = ROOT / "reports" / "figures"
+from chadrisk.config import PATHS  # noqa: E402
+
+DATA = PATHS.labelled_events
+FIG_DIR = PATHS.figures
 FIG_DIR.mkdir(parents=True, exist_ok=True)
 
 df = pd.read_csv(DATA, parse_dates=["event_date"])
