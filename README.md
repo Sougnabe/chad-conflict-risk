@@ -1,120 +1,168 @@
 # Farmer-Herder Conflict Risk in Southern Chad
 
-Capstone project — BSc Software Engineering (Machine Learning), African Leadership University.
+**Capstone project — BSc Software Engineering (Machine Learning), African Leadership University**
 
-The project estimates, for each of the 26 departments of southern Chad and for each month,
-the risk of violent farmer-herder conflict. It combines a manually validated conflict dataset
-(ACLED) with satellite indicators of pasture and the crop calendar. A Streamlit dashboard
-presents the results to support humanitarian and local decision-makers.
+| | |
+|---|---|
+| 🎥 **Walkthrough video** | [VIDEO LINK — to be added](#) |
+| 📄 **Technical report (PDF)** | [REPORT LINK — to be added](#) |
+| 🌐 **Live dashboard** | [DASHBOARD LINK — to be added](#) |
 
-## Pipeline
+## Overview
 
-| Step | Script | Output |
+Violent clashes between farmers and herders killed about 470 people in the seven southern
+provinces of Chad between 2019 and 2025, and the response usually comes after the violence.
+This project estimates, **for each of the 26 southern departments and each quarter, the risk of
+farmer-herder conflict**, so that humanitarian organisations, local authorities and mediation
+committees can focus prevention before violence happens.
+
+It combines:
+- a **new, validated dataset** of farmer-herder conflict events: all 1,593 ACLED events for Chad
+  (2015–2025) classified with a written codebook, blind validation Cohen's kappa = 0.83;
+- **satellite indicators** from Google Earth Engine: crop greenness (MODIS NDVI), rainfall
+  (CHIRPS), pasture conditions in the herds' northern departure zones, cropland, surface water,
+  population;
+- **machine-learning models** evaluated without look-ahead (selection on 2019–2023, single test
+  on 2024 – Sept 2025);
+- a **bilingual (English / French) dashboard** with the outlook for the coming quarter, the
+  factors behind each department's score, a replay of 2024–2025 and the research findings.
+
+**Research question.** Do satellite-derived indicators improve the prediction of farmer-herder
+conflict risk, compared with conflict history alone?
+**Main result.** With only the information really available at forecast time (conflict data
+are published with a 12-month delay), conflict history alone scores at chance level (PR-AUC
+0.110, chance = 0.110); adding satellite indicators raises it to 0.214. In the 2024–2025 replay,
+the 10 departments flagged as priority had a conflict in 20% of quarters, against 5% for the
+others. Details and limitations: `docs/model_card.md`.
+
+![Current outlook](docs/screenshots/outlook.png)
+
+## Technical requirements
+
+| Item | Version / requirement |
+|---|---|
+| Language | Python 3.11 or later (developed and tested with **Python 3.13.2**) |
+| Operating systems tested | Windows 11 (development); the dashboard is tested in Chromium, Firefox and WebKit |
+| Main libraries | pandas 2.3, NumPy 2.3, GeoPandas 1.2, Shapely 2.1, scikit-learn 1.9, XGBoost 3.4, SHAP 0.53, joblib 1.5, Matplotlib 3.11 |
+| Dashboard | Streamlit 1.64, Folium 0.20, streamlit-folium 0.27 |
+| Data services | ACLED API (research account), Google Earth Engine (`earthengine-api` 1.7, non-commercial project) |
+| Testing | pytest 9.1, Playwright 1.64 (browser tests), psutil 7.2 (benchmark) |
+| Hardware | Any laptop with 4 GB RAM; peak memory ≈ 250 MB. Full training of the four configurations, with figures and reports, takes about 2.5–4 minutes on a 4-core laptop CPU |
+| Storage | ≈ 10 MB for code and processed data (raw ACLED data are not distributed) |
+
+Exact versions: `requirements.txt` (pipeline and dashboard), `requirements-dev.txt` (tests and
+tools), `app/requirements.txt` (deployed dashboard only).
+
+## Installation
+
+```bash
+git clone https://github.com/Sougnabe/chad-conflict-risk.git
+cd chad-conflict-risk
+python -m venv .venv
+.venv\Scripts\activate            # Windows   (macOS/Linux: source .venv/bin/activate)
+pip install -r requirements-dev.txt
+python -m playwright install chromium firefox webkit   # only for the browser tests
+```
+
+**Run the dashboard** (uses the database included in the repository):
+
+```bash
+streamlit run app/app.py
+```
+
+**Run the tests:**
+
+```bash
+python -m pytest                   # 70 tests: unit + integration + dashboard
+```
+
+**Re-run the pipeline** (needs credentials; copy `.env.example` to `.env` and fill it in):
+
+| Step | Command | Output |
 |---|---|---|
-| 1. Download conflict events (ACLED API) | `scripts/download_acled.py` | `data/raw/acled_chad_2015_2025.csv` |
-| 2. Apply validated labels, build target | `scripts/build_target.py` | `data/processed/acled_chad_labeled.csv` |
-| 3. Exploratory figures | `scripts/eda_acled.py` | `reports/figures/*.png` |
-| 4. Department x month panel | `scripts/build_panel.py` | `data/processed/panel_dept_month.csv` |
-| 5. Application database | `scripts/init_db.py` | `data/app.db` |
-| 6. Satellite indicators (Google Earth Engine) | `scripts/gee_extract.py` | `data/processed/satellite_features.csv` |
-| 7. Feature table (no look-ahead) | `scripts/build_features.py` | `data/processed/features.csv` |
-| 8. Training, evaluation, SHAP, predictions | `scripts/train_models.py` (see below) | `reports/metrics_<mode>_<unit>.csv`, predictions in `data/app.db` |
-| 9. Dashboard | `streamlit run app/app.py` | — |
+| 1. Download conflict events | `python scripts/download_acled.py` | `data/raw/acled_chad_2015_2025.csv` |
+| 2. Labels and target | `python scripts/build_target.py` | `data/processed/acled_chad_labeled.csv` |
+| 3. Exploratory figures | `python scripts/eda_acled.py` | `reports/figures/` |
+| 4. Department × month panel | `python scripts/build_panel.py` | `data/processed/panel_dept_month.csv` |
+| 5. Dashboard database | `python scripts/init_db.py` | `data/app.db` |
+| 6. Satellite indicators | `python scripts/gee_extract.py` (once: `earthengine authenticate`) | `data/processed/satellite_features.csv` |
+| 7. Features (no look-ahead) | `python scripts/build_features.py` | `data/processed/features.csv` |
+| 8. Training and evaluation | `python scripts/train_models.py --mode research --unit quarter` (also `--unit month`; `--mode operational --unit quarter --fixed-model logreg_OB`; `--mode operational --unit month`) | `reports/`, predictions in `data/app.db` |
 
-Step 8 is run four times:
+**Monthly update of the outlook** (new satellite month → features → operational models):
+`python scripts/update_outlook.py`. ACLED data are refreshed separately because new events must
+first be classified with the codebook.
 
-```
-python scripts/train_models.py --mode research --unit quarter
-python scripts/train_models.py --mode research --unit month
-python scripts/train_models.py --mode operational --unit quarter --fixed-model logreg_OB
-python scripts/train_models.py --mode operational --unit month
-```
+The whole pipeline, with its outputs and the package source code, is also available as a
+notebook: `notebooks/capstone_pipeline.ipynb`.
 
-**Monthly update of the outlook** (new satellite month, rebuilt features, retrained
-operational models), in one command:
+## Repository structure
 
 ```
-python scripts/update_outlook.py
+chad-conflict-risk/
+├── chadrisk/                  # Python package (all the logic, object-oriented)
+│   ├── config.py              # paths and constants, defined once
+│   ├── data/                  # AcledClient, LabelledEvents, Geography, PanelBuilder, SatelliteExtractor
+│   ├── features/              # FeatureGroup (abstract) + history, seasonal, satellite groups; builder
+│   ├── models/                # RiskModel (abstract) + logistic, XGBoost, baseline rule
+│   ├── evaluation/            # Evaluator, MonthBlockBootstrap, RollingOriginSelector, PriorityTiers
+│   ├── experiment.py          # Experiment: one training/evaluation run
+│   ├── reporting.py           # ExperimentReporter: result files, figures, predictions
+│   └── storage.py             # RiskRepository: the only access to the SQLite database
+├── app/                       # Streamlit dashboard
+│   ├── app.py                 # page: one function per view
+│   ├── components.py          # map and ranking components
+│   └── i18n.py                # Translator + English/French texts
+├── scripts/                   # thin command-line entry points (steps 1-8, update, benchmark, browsers)
+├── tests/
+│   ├── unit/                  # 48 tests of each class on synthetic data
+│   └── integration/           # 22 tests of the real pipeline outputs and the dashboard
+├── data/
+│   ├── external/              # administrative boundaries (geoBoundaries)
+│   ├── processed/             # labels, panel, satellite indicators, features
+│   └── app.db                 # dashboard database (aggregated data only)
+├── reports/                   # metrics, figures, performance and browser results
+├── notebooks/                 # full pipeline notebook (generated by scripts/make_notebook.py)
+└── docs/                      # codebook, model card, practitioner questionnaire, screenshots
 ```
 
-The satellite extraction detects the last complete month automatically. Conflict data are
-refreshed separately, because new ACLED events must first be classified with the codebook.
+## Architecture and design
 
-Steps 4 to 8 can be re-run in order at any time. Step 6 requires a Google Earth Engine account;
-until it is run, only the conflict-history model (feature set A) is trained.
+- **Layered architecture:** data access (`data/`, `storage.py`) → feature engineering
+  (`features/`) → models (`models/`) → evaluation (`evaluation/`) → orchestration
+  (`experiment.py`, `reporting.py`) → presentation (`app/`). Scripts only parse arguments and
+  call the package.
+- **Abstraction and polymorphism:** `RiskModel` defines `fit`, `predict_risk`, `candidates` and
+  `clone`; logistic regression, XGBoost and the baseline rule implement it, and selection,
+  evaluation and prediction use any of them unchanged. `FeatureGroup` does the same for feature
+  groups (`ConflictHistoryFeatures` is reused with a 1-month and a 13-month delay).
+- **Encapsulation:** `RiskRepository` hides SQL; `AcledClient` hides authentication;
+  `Translator` hides language handling.
+- **Algorithms:** rolling-origin (expanding window) model selection run in parallel;
+  month-block bootstrap confidence intervals; R-tree spatial index for the department
+  neighbourhood graph; spatial join of events; vectorised O(n) "months since last conflict";
+  leakage guard; priority tiers.
 
-## Notebook
+## Testing, performance and compatibility
 
-`notebooks/capstone_pipeline.ipynb` contains the whole pipeline in one place, with an
-explanation and the outputs (tables, figures, test results) for each step. It is generated
-from the scripts, which remain the reference implementation:
+| Evidence | File |
+|---|---|
+| 70 automated tests (unit, integration, functional dashboard tests with different inputs) | `tests/` |
+| Benchmark: time and memory per stage, before/after optimisation | `reports/performance/benchmark.md`, `before_after.md` |
+| Browser and device tests: Chromium, Firefox, WebKit; desktop, mobile, low-end emulation | `reports/performance/browsers.md`, `screenshots/` |
 
-```
-python scripts/make_notebook.py
-python -m nbconvert --to notebook --execute --inplace notebooks/capstone_pipeline.ipynb
-```
+## Deployment
 
-## Setup
-
-```
-pip install -r requirements.txt
-copy .env.example .env      # then fill in ACLED and Earth Engine credentials
-earthengine authenticate    # once, for step 6
-```
-
-## Tests
-
-```
-python -m pytest -v
-```
-15 automated tests check label and panel consistency, the absence of look-ahead in every
-feature (history, delayed history and satellite), the absence of outcome leakage, the validity of the stored
-predictions and priority levels, and that the dashboard runs without errors in English
-and French.
-
-## Deployment (Streamlit Community Cloud)
-1. Push the repository to GitHub. Files containing raw ACLED notes are excluded by `.gitignore`.
-2. On share.streamlit.io, create an app from the repository with main file `app/app.py`.
-   Dependencies are read from `app/requirements.txt`.
-3. The deployed app reads only `data/app.db` and `reports/`, which hold aggregated data.
-
-## Methodology in brief
-- **Target:** at least one farmer-herder conflict event in a department-month. Events were
-  classified with a written codebook (`docs/labeling_codebook.md`); blind validation on 60
-  events gave Cohen's kappa = 0.83.
-- **Unit:** 26 departments x months, January 2019 – September 2025 (2018 used only as burn-in).
-  Two horizons are evaluated: next month, and next quarter (risk of at least one event in the
-  three months starting at the forecast date).
-- **Two models, two purposes.**
-  - *Research model* — conflict history up to the previous month. Feature sets: A = conflict
-    history; B = A + southern satellite indicators; C = B + northern herd-departure zones.
-    It answers the research question: do satellite indicators add information?
-  - *Operational model* — only what is really available when a forecast is issued: ACLED
-    Research-tier data are published with a 12-month delay, so conflict history stops at
-    month t-13; satellite data run up to the previous month. Feature sets: OA = lagged history
-    + season; OB = OA + satellite. It produces the dashboard's current outlook (logistic
-    regression OB, fixed by design because the outlook must react to current conditions and
-    automatic selection was unstable with so few positive cases).
-- **Validation:** model selection on 2019–2023 by rolling-origin validation (validate on 2021,
-  2022, 2023), single evaluation on the held-out test period 2024–Sept 2025.
-  Every feature uses only information available before the predicted month.
-- **Metrics:** PR-AUC (primary, with month-block bootstrap CI), ROC-AUC, recall in the top 10%,
-  Brier score. Baseline to beat: conflicts in the last 12 months.
-
-## Dashboard
-Available in English and French. Tabs: *Current outlook* (risk for the coming quarter, with
-the factors behind each department's score and what the priority levels have meant in the
-past), *Replay 2024–2025*, *Findings* (answers to the research question, read from the result
-files), *Observed conflicts*, *About the models*.
-
-## Documentation
-- `docs/labeling_codebook.md` — how conflict events were classified and validated.
-- `docs/model_card.md` — intended use, prohibited uses, performance, limitations, ethics.
-- `docs/practitioner_feedback_form.md` — questionnaire for practitioners.
+On Streamlit Community Cloud: main file `app/app.py` (dependencies from `app/requirements.txt`).
+The deployed app reads only `data/app.db` and `reports/`, which hold aggregated data. The
+database path can be changed with the environment variable `CHADRISK_DB`.
 
 ## Data and ethics
-- Raw ACLED data are not redistributed (licence); `data/raw/` is excluded from Git.
-- Results are aggregated at department level; no ethnic or religious variables are used.
-- The dashboard is a decision-support tool, not an automated decision system.
-- AI tools were used for coding assistance and the first-pass event classification;
-  all labels used as ground truth were checked against a blind human validation.
+
+- Raw ACLED data and any file containing event notes are not redistributed (licence); they are
+  excluded by `.gitignore`.
+- Outputs are aggregated at department level; no ethnic or religious variable is used.
+- The dashboard supports human decisions; it does not make them. Intended and prohibited uses:
+  `docs/model_card.md`.
+- AI tools were used for coding assistance and for a first-pass event classification; every
+  label used as ground truth was checked against a blind human validation.
