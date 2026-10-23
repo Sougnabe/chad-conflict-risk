@@ -243,6 +243,26 @@ if ARGS.fixed_model:
 else:
     best_name = auto_name
 best_model, best_cols, best_p = fitted[best_name]
+
+# What the priority levels have meant in the test period: share of department-periods with at
+# least one conflict, by rank of the model's risk score (26 departments ranked each period)
+# The dashboard uses two levels (Priority = top 10, Lower); the finer split is kept for the report
+TIERS = [("Top 5", 1, 5), ("Ranks 6-10", 6, 10), ("Priority", 1, 10), ("Lower", 11, 26)]
+tiers = test[["dept_id", "ym", "y_fh"]].assign(risk=best_p)
+tiers["rank"] = tiers.groupby("ym")["risk"].rank(ascending=False, method="first")
+tier_rows = []
+for label, lo, hi in TIERS:
+    sub = tiers[tiers["rank"].between(lo, hi)]
+    tier_rows.append({"tier": label, "ranks": f"{lo}-{hi}", "periods": int(len(sub)),
+                      "with_conflict": int(sub["y_fh"].sum()),
+                      "conflict_rate": float(sub["y_fh"].mean())})
+tier_df = pd.DataFrame(tier_rows)
+tier_df["overall_rate"] = float(test["y_fh"].mean())
+tier_df.to_csv(REPORTS / f"tiers_{TAG}.csv", index=False)
+print("\nConflict rate by priority level (test period):")
+print(tier_df[["tier", "ranks", "periods", "with_conflict", "conflict_rate"]].round(3)
+      .to_string(index=False))
+
 with open(REPORTS / f"selection_{TAG}.json", "w", encoding="utf8") as f:
     json.dump({"auto_selected": auto_name, "used_for_predictions": best_name,
                "fixed_by_design": bool(ARGS.fixed_model)}, f, indent=2)
@@ -317,6 +337,23 @@ with sqlite3.connect(DB) as con:
         pred[["dept_id", "ym", "model", "risk"]].itertuples(index=False),
     )
 print(f"\n{len(pred)} predictions saved ({forecast['ym'].iloc[0]} = forecast)")
+
+# Freshness of the forecast (shown by the dashboard)
+fc_start = pd.Period(forecast["ym"].iloc[0], freq="M")
+sat_last = fc_start - 1
+meta = {
+    "mode": MODE, "unit": UNIT, "model": best_name,
+    "issued_on": pd.Timestamp.today().strftime("%Y-%m-%d"),
+    "forecast_start": str(fc_start),
+    "forecast_end": str(fc_start + (2 if UNIT == "quarter" else 0)),
+    "conflict_data_end": str(pd.Period(df["ym"].max(), freq="M")
+                             + (2 if UNIT == "quarter" else 0)),
+    "satellite_data_end": str(sat_last) if MODE == "operational" else None,
+    # The next satellite month is usually published about 3 weeks after it ends
+    "next_update_expected": str(sat_last + 2) + "-20" if MODE == "operational" else None,
+}
+with open(REPORTS / f"outlook_{TAG}.json", "w", encoding="utf8") as f:
+    json.dump(meta, f, indent=2)
 
 # Per-department explanation of the forecast (logistic model only): contribution of each
 # feature to the log-odds = standardised coefficient x standardised value

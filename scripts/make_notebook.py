@@ -90,6 +90,9 @@ def adapt(name, code):
     code = code.replace("plt.close()", "plt.show()")
     if name == "download_acled.py":
         code = code.replace('if __name__ == "__main__":\n    main()', "if RUN_DOWNLOAD:\n    main()\nelse:\n    print(\"Skipped: ACLED data already downloaded (set RUN_DOWNLOAD = True to re-run).\")")
+    if name == "gee_extract.py":
+        assert "parser.parse_args().end" in code
+        code = code.replace("parser.parse_args().end", "parser.parse_args([]).end")
     if name == "train_models.py":
         code = code.replace("import argparse\n", "")
         code = re.sub(

@@ -1,0 +1,11 @@
+{
+  "mode": "research",
+  "unit": "quarter",
+  "model": "xgboost_C",
+  "issued_on": "2026-10-18",
+  "forecast_start": "2025-10",
+  "forecast_end": "2025-12",
+  "conflict_data_end": "2025-09",
+  "satellite_data_end": null,
+  "next_update_expected": null
+}

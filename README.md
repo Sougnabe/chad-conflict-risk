@@ -30,6 +30,16 @@ python scripts/train_models.py --mode operational --unit quarter --fixed-model l
 python scripts/train_models.py --mode operational --unit month
 ```
 
+**Monthly update of the outlook** (new satellite month, rebuilt features, retrained
+operational models), in one command:
+
+```
+python scripts/update_outlook.py
+```
+
+The satellite extraction detects the last complete month automatically. Conflict data are
+refreshed separately, because new ACLED events must first be classified with the codebook.
+
 Steps 4 to 8 can be re-run in order at any time. Step 6 requires a Google Earth Engine account;
 until it is run, only the conflict-history model (feature set A) is trained.
 
@@ -57,9 +67,10 @@ earthengine authenticate    # once, for step 6
 ```
 python -m pytest -v
 ```
-14 automated tests check label and panel consistency, the absence of look-ahead in every
+15 automated tests check label and panel consistency, the absence of look-ahead in every
 feature (history, delayed history and satellite), the absence of outcome leakage, the validity of the stored
-predictions, and that the dashboard runs without errors.
+predictions and priority levels, and that the dashboard runs without errors in English
+and French.
 
 ## Deployment (Streamlit Community Cloud)
 1. Push the repository to GitHub. Files containing raw ACLED notes are excluded by `.gitignore`.
@@ -89,6 +100,17 @@ predictions, and that the dashboard runs without errors.
   Every feature uses only information available before the predicted month.
 - **Metrics:** PR-AUC (primary, with month-block bootstrap CI), ROC-AUC, recall in the top 10%,
   Brier score. Baseline to beat: conflicts in the last 12 months.
+
+## Dashboard
+Available in English and French. Tabs: *Current outlook* (risk for the coming quarter, with
+the factors behind each department's score and what the priority levels have meant in the
+past), *Replay 2024–2025*, *Findings* (answers to the research question, read from the result
+files), *Observed conflicts*, *About the models*.
+
+## Documentation
+- `docs/labeling_codebook.md` — how conflict events were classified and validated.
+- `docs/model_card.md` — intended use, prohibited uses, performance, limitations, ethics.
+- `docs/practitioner_feedback_form.md` — questionnaire for practitioners.
 
 ## Data and ethics
 - Raw ACLED data are not redistributed (licence); `data/raw/` is excluded from Git.

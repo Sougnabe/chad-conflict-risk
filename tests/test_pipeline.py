@@ -6,11 +6,12 @@ They check the properties the results depend on:
     - no feature uses information from the month being predicted (no look-ahead);
     - outcome columns never enter a feature set (no leakage);
     - the database and the predictions are valid;
-    - the dashboard runs without errors.
+    - the dashboard runs without errors, in English and in French.
 
 Run after the pipeline (README, steps 2-8):  python -m pytest -v
 """
 
+import json
 import sqlite3
 from pathlib import Path
 
@@ -151,11 +152,24 @@ def test_metrics_reports_exist():
         assert m["pr_auc"].between(0, 1).all()
 
 
+def test_priority_levels_and_outlook_metadata():
+    tiers = pd.read_csv(ROOT / "reports" / "tiers_operational_quarter.csv")
+    pri = tiers[tiers["tier"] == "Priority"].iloc[0]
+    low = tiers[tiers["tier"] == "Lower"].iloc[0]
+    assert pri["periods"] + low["periods"] == 26 * tiers["periods"].iloc[0] / 5
+    meta = json.loads((ROOT / "reports" / "outlook_operational_quarter.json").read_text("utf8"))
+    assert meta["forecast_start"] > meta["satellite_data_end"] > meta["conflict_data_end"]
+
+
 # ---------- Dashboard ----------
-def test_dashboard_runs_without_errors():
+def test_dashboard_runs_in_english_and_french():
     from streamlit.testing.v1 import AppTest
 
     at = AppTest.from_file(str(ROOT / "app" / "app.py"), default_timeout=180).run()
     assert not at.exception
-    assert [t.label for t in at.tabs] == ["Current outlook", "Replay 2024–2025",
+    assert [t.label for t in at.tabs] == ["Current outlook", "Replay 2024–2025", "Findings",
                                           "Observed conflicts", "About the models"]
+    assert any("Research question" in m.value for m in at.markdown)
+    at.sidebar.radio[0].set_value("Français").run()
+    assert not at.exception
+    assert [t.label for t in at.tabs][0] == "Perspectives actuelles"

@@ -23,12 +23,14 @@ Output variables (one row per department x month, 2018-01 -> END_MONTH):
 The one-month lag (no look-ahead) is applied afterwards in build_features.py.
 
 Incremental: if satellite_features.csv already exists, only the missing months up to
-END_MONTH are extracted and appended. Set END_MONTH to the last complete month available
-in both CHIRPS and MODIS.
+END_MONTH are extracted and appended. END_MONTH is detected automatically as the last month
+that is complete in both CHIRPS (its last pentad, starting on the 26th, is published) and
+MODIS (its second 16-day composite is published). It can be forced with --end YYYY-MM.
 
 Usage: python scripts/gee_extract.py
 """
 
+import argparse
 import os
 import sys
 from pathlib import Path
@@ -50,13 +52,33 @@ if not project:
 ee.Initialize(project=project)
 
 NORTH_ADM1 = ["Batha", "Guéra", "Salamat", "Ouaddaï"]
-END_MONTH = "2026-09"
+def last_complete_month():
+    """Last month complete in both CHIRPS (pentad of the 26th) and MODIS (2nd composite)."""
+    def last_start(name):
+        c = ee.ImageCollection(name).filterDate("2015-01-01", "2100-01-01")
+        return pd.Timestamp(ee.Date(c.aggregate_max("system:time_start")).format(
+            "YYYY-MM-dd").getInfo())
+
+    def complete(last, min_day):
+        p = pd.Period(last, freq="M")
+        return p if last.day >= min_day else p - 1
+
+    chirps = complete(last_start("UCSB-CHG/CHIRPS/PENTAD"), 26)
+    modis = complete(last_start("MODIS/061/MOD13Q1"), 14)
+    return min(chirps, modis)
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--end", default=None, help="last month to extract (YYYY-MM)")
+END_MONTH = parser.parse_args().end or str(last_complete_month())
+print(f"Last complete satellite month: {END_MONTH}")
 existing = pd.read_csv(OUT) if OUT.exists() else None
 first = (pd.Period(existing["ym"].max(), freq="M") + 1) if existing is not None else pd.Period("2017-12", freq="M")
 MONTHS = pd.period_range(first, END_MONTH, freq="M")
 print(f"Months to extract: {len(MONTHS)} ({MONTHS[0] if len(MONTHS) else None} -> {END_MONTH})")
 if len(MONTHS) == 0:
-    sys.exit("Nothing to extract: satellite_features.csv is already up to date.")
+    print("Nothing to extract: satellite_features.csv is already up to date.")
+    sys.exit(0)
 SCALE_NDVI = 250
 SCALE_RAIN = 5566
 

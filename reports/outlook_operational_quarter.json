@@ -1,0 +1,11 @@
+{
+  "mode": "operational",
+  "unit": "quarter",
+  "model": "logreg_OB",
+  "issued_on": "2026-10-18",
+  "forecast_start": "2026-10",
+  "forecast_end": "2026-12",
+  "conflict_data_end": "2025-09",
+  "satellite_data_end": "2026-09",
+  "next_update_expected": "2026-11-20"
+}
