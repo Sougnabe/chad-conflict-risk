@@ -6,7 +6,7 @@
 |---|---|
 | 🎥 **Walkthrough video** | [VIDEO LINK — to be added](#) |
 | 📄 **Technical report (PDF)** | [REPORT LINK — to be added](#) |
-| 🌐 **Live dashboard** | [DASHBOARD LINK — to be added](#) |
+| 🌐 **Live dashboard** | [chad-conflict-risk.streamlit.app](https://chad-conflict-risk.streamlit.app/) |
 
 ## Overview
 
