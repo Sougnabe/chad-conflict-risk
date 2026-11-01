@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | 🎥 **Walkthrough video** | [VIDEO LINK — to be added](#) |
-| 📄 **Technical report (PDF)** | [REPORT LINK — to be added](#) |
+| 📄 **Technical report (PDF)** | [docs/technical_report.pdf](https://github.com/Sougnabe/chad-conflict-risk/blob/main/docs/technical_report.pdf) |
 | 🌐 **Live dashboard** | [chad-conflict-risk.streamlit.app](https://chad-conflict-risk.streamlit.app/) |
 
 ## Overview
