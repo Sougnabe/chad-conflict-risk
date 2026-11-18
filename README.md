@@ -73,7 +73,7 @@ streamlit run app/app.py
 **Run the tests:**
 
 ```bash
-python -m pytest                   # 70 tests: unit + integration + dashboard
+python -m pytest                   # 81 tests: unit + integration + dashboard
 ```
 
 **Re-run the pipeline** (needs credentials; copy `.env.example` to `.env` and fill it in):
@@ -115,8 +115,8 @@ chad-conflict-risk/
 │   └── i18n.py                # Translator + English/French texts
 ├── scripts/                   # thin command-line entry points (steps 1-8, update, benchmark, browsers)
 ├── tests/
-│   ├── unit/                  # 48 tests of each class on synthetic data
-│   └── integration/           # 22 tests of the real pipeline outputs and the dashboard
+│   ├── unit/                  # 56 tests of each class on synthetic data, ethics guards
+│   └── integration/           # 25 tests of the real pipeline outputs and the dashboard
 ├── data/
 │   ├── external/              # administrative boundaries (geoBoundaries)
 │   ├── processed/             # labels, panel, satellite indicators, features
@@ -147,7 +147,7 @@ chad-conflict-risk/
 
 | Evidence | File |
 |---|---|
-| 70 automated tests (unit, integration, functional dashboard tests with different inputs) | `tests/` |
+| 81 automated tests (unit, integration, functional dashboard tests with different inputs) | `tests/` |
 | Benchmark: time and memory per stage, before/after optimisation | `reports/performance/benchmark.md`, `before_after.md` |
 | Browser and device tests: Chromium, Firefox, WebKit; desktop, mobile, low-end emulation | `reports/performance/browsers.md`, `screenshots/` |
 
@@ -161,7 +161,12 @@ database path can be changed with the environment variable `CHADRISK_DB`.
 
 - Raw ACLED data and any file containing event notes are not redistributed (licence); they are
   excluded by `.gitignore`.
-- Outputs are aggregated at department level; no ethnic or religious variable is used.
+- Outputs are aggregated at department level; no ethnic or religious variable is used, and
+  `check_feature_sets` (`chadrisk/experiment.py`) stops training if a feature describes ethnicity,
+  religion, language or conflict actors.
+- The dashboard collects nothing about its visitors (no forms, no analytics; Streamlit usage
+  statistics are disabled). Its *Privacy & terms* page states these promises, the prohibited
+  uses and the data licences; every map cites ACLED, as its Attribution Policy requires.
 - The dashboard supports human decisions; it does not make them. Intended and prohibited uses:
   `docs/model_card.md`.
 - AI tools were used for coding assistance and for a first-pass event classification; every

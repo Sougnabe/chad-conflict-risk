@@ -4,3 +4,7 @@ primaryColor = "#c0392b"
 
 [server]
 headless = true
+
+[browser]
+# Privacy: Streamlit sends usage statistics by default; the dashboard promises no tracking
+gatherUsageStats = false

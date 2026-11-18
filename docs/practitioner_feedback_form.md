@@ -3,6 +3,39 @@
 *To be shared with the dashboard link. Estimated time: 10 minutes. Responses are anonymous and
 used only for an undergraduate research project at African Leadership University.*
 
+## Information and consent (must be accepted before the questions)
+
+**Purpose.** This questionnaire asks practitioners whether a dashboard that ranks the 26
+departments of southern Chad by quarterly risk of farmer-herder conflict is accurate, clear and
+useful. It is part of an undergraduate capstone project in Software Engineering at African
+Leadership University (ALU), approved by the ALU Research Ethics Committee
+(approval code SEPT26-BSE-087).
+
+**What you will do.** Look at the dashboard (https://chad-conflict-risk.streamlit.app/) and
+answer 12 questions. It takes about 10 minutes.
+
+**Anonymity.** The form does not ask for your name, email, organisation name or location, and
+does not record email addresses. Do not write names of people or villages in your answers.
+Answers are reported only in grouped form or as short anonymous quotes.
+
+**Voluntary participation.** Taking part is voluntary. There is no payment or reward, and
+refusing has no consequence for you or your organisation. You may skip any question and stop at
+any time.
+
+**Withdrawal.** Because no identity is recorded, a response cannot be linked to you after it is
+submitted. If you want to withdraw before submitting, simply close the form; nothing is saved.
+
+**Data use and storage.** Answers are used only to evaluate the dashboard in the capstone
+report. They are kept in the researcher's ALU Google account, are not shared with third parties,
+and are deleted at the end of the project.
+
+**Contact.** Researcher: Sougnabe Payang, s.payang@alustudent.com. Ethics questions: ALU
+Research Ethics Committee, researchethics@alueducation.com.
+
+**Consent (required).**
+☐ I have read the information above, I am 18 or older, and I agree to take part.
+☐ I do not agree (the form ends here).
+
 ## About you
 1. What type of organisation do you work for?
    ☐ International NGO ☐ National NGO ☐ UN agency ☐ Government / local administration

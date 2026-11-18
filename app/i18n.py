@@ -15,9 +15,17 @@ TXT = {
     "title": ("Farmer-Herder Conflict Risk — Southern Chad",
               "Risque de conflit agriculteurs-éleveurs — Sud du Tchad"),
     "tabs": (["Current outlook", "Replay 2024–2025", "Findings", "Observed conflicts",
-              "About the models"],
+              "About the models", "Privacy & terms"],
              ["Perspectives actuelles", "Rejeu 2024–2025", "Résultats", "Conflits observés",
-              "À propos des modèles"]),
+              "À propos des modèles", "Confidentialité et conditions"]),
+    "map_source": ("Conflict data: ACLED (Armed Conflict Location & Event Data), "
+                   "[acleddata.com](https://acleddata.com), events classified by the author. "
+                   "Boundaries: geoBoundaries / OCHA Chad (CC BY 3.0 IGO). Background map: © "
+                   "OpenStreetMap contributors.",
+                   "Données de conflit : ACLED (Armed Conflict Location & Event Data), "
+                   "[acleddata.com](https://acleddata.com), événements classés par l'auteur. "
+                   "Limites : geoBoundaries / OCHA Tchad (CC BY 3.0 IGO). Fond de carte : © "
+                   "contributeurs OpenStreetMap."),
     "caption": ("Research prototype · satellite data up to **{sat}** · conflict data (ACLED, "
                 "published with a 12-month delay) up to **{conf}** · department level only.",
                 "Prototype de recherche · données satellite jusqu'à **{sat}** · données de "
@@ -210,6 +218,151 @@ visible ; le satellite voit les cultures sécher, pas la récolte elle-même.
 """,
 }
 
+PRIVACY = {
+    "en": """
+## Privacy policy and terms of use
+*Version 1.0 · last updated 18 November 2026*
+
+This dashboard is a research prototype built by Sougnabe Payang for a BSc Software Engineering
+capstone project at African Leadership University (ALU). The research was approved by the ALU
+Research Ethics Committee (approval code SEPT26-BSE-087). Contact: s.payang@alustudent.com.
+
+### 1. What we collect about you
+**Nothing.** The dashboard has no account, no sign-in, no form and no analytics. It does not ask
+for, store or share any information about the people who use it. Your choice of page and
+language is kept only for the current browser session. Streamlit's own usage statistics are
+switched off (`.streamlit/config.toml`).
+
+Two third parties necessarily see technical data (such as your IP address) when you open the
+page: the host, Streamlit Community Cloud ([privacy policy](https://streamlit.io/privacy-policy)),
+and the OpenStreetMap servers that send the background map
+([privacy policy](https://osmfoundation.org/wiki/Privacy_Policy)).
+
+### 2. What the dashboard shows
+Only **aggregated, department-level** information for the 26 departments of southern Chad:
+monthly counts of farmer-herder conflict events and fatalities, satellite indicators (crop and
+pasture greenness, rainfall, cropland, surface water, population density) and risk scores.
+It contains **no names, no villages, no event descriptions and no ethnic, religious or language
+information**.
+
+### 3. Our promises and how the software keeps them
+| Promise | How it is enforced |
+|---|---|
+| No information about protected characteristics | `check_feature_sets` (in `chadrisk/experiment.py`) stops training if a feature describes ethnicity, religion, language or conflict actors |
+| No look-ahead in the forecasts | the same function refuses any outcome column as a feature; tests check every feature date |
+| Only aggregated data published | `RiskRepository` stores department-level tables only; raw ACLED files are excluded by `.gitignore` |
+| No tracking of visitors | no forms or analytics in the code; Streamlit usage statistics disabled |
+| Honest about uncertainty | confidence intervals and limits on the *Findings* page; scores are ranks, not probabilities |
+| Accessible | English and French; language switch on the page (not in a sidebar hidden on phones); light map payload for slow connections |
+
+### 4. Terms of use
+- **Decision support only.** The ranking helps decide where to focus prevention. It must be
+  combined with local knowledge and never trigger action on its own.
+- **Prohibited uses:** targeting, profiling or policing any community; linking the scores to
+  ethnic or religious information; automated decisions about people, land, herd movements or
+  security deployments; predicting individual incidents, villages or dates; use outside
+  southern Chad without re-validation; publishing the maps as "danger maps".
+- **No warranty.** Few conflicts are recorded each quarter and media reports miss some events,
+  so scores can be wrong in both directions. The author accepts no liability for decisions
+  taken on the basis of this prototype.
+- **Non-commercial use**, as required by the ACLED licence.
+
+### 5. Data sources and licences
+| Source | Licence / terms |
+|---|---|
+| ACLED conflict events (classified by the author) | ACLED End User License Agreement and Attribution Policy; raw data not redistributed |
+| MODIS MOD13Q1 vegetation index (NASA) | no restrictions on use or redistribution |
+| CHIRPS rainfall (Climate Hazards Center, UCSB) | public domain |
+| ESA WorldCover 2021 | CC BY 4.0 |
+| JRC Global Surface Water | Copernicus programme, free use with acknowledgement |
+| WorldPop population 2020 | CC BY 4.0 |
+| Administrative boundaries: geoBoundaries / OCHA Chad | CC BY 3.0 IGO |
+| Background map: OpenStreetMap | ODbL 1.0, © OpenStreetMap contributors |
+
+### 6. Legal framework
+Designed to respect Chad's Law n° 007/PR/2015 on personal data protection, Rwanda's Law
+n° 058/2021 on the protection of personal data and privacy (ALU is based in Kigali) and the
+African Union Convention on Cyber Security and Personal Data Protection (Malabo, 2014).
+
+### 7. Changes and contact
+Any change to this policy will be dated above. Questions, corrections or requests to remove
+content: s.payang@alustudent.com.
+""",
+    "fr": """
+## Politique de confidentialité et conditions d'utilisation
+*Version 1.0 · dernière mise à jour le 18 novembre 2026*
+
+Ce tableau de bord est un prototype de recherche réalisé par Sougnabe Payang dans le cadre d'un
+projet de fin d'études (BSc Software Engineering) à l'African Leadership University (ALU). La
+recherche a été approuvée par le Comité d'éthique de la recherche de l'ALU (code d'approbation
+SEPT26-BSE-087). Contact : s.payang@alustudent.com.
+
+### 1. Ce que nous collectons sur vous
+**Rien.** Le tableau de bord n'a ni compte, ni connexion, ni formulaire, ni outil de mesure
+d'audience. Il ne demande, ne conserve et ne partage aucune information sur ses utilisateurs.
+Le choix de la page et de la langue n'est gardé que pendant la session du navigateur. Les
+statistiques d'utilisation de Streamlit sont désactivées (`.streamlit/config.toml`).
+
+Deux tiers voient nécessairement des données techniques (comme votre adresse IP) quand vous
+ouvrez la page : l'hébergeur, Streamlit Community Cloud
+([politique de confidentialité](https://streamlit.io/privacy-policy)), et les serveurs
+OpenStreetMap qui envoient le fond de carte
+([politique de confidentialité](https://osmfoundation.org/wiki/Privacy_Policy)).
+
+### 2. Ce que montre le tableau de bord
+Uniquement des informations **agrégées par département** pour les 26 départements du sud du
+Tchad : nombre mensuel d'événements de conflit agriculteurs-éleveurs et de décès, indicateurs
+satellite (verdure des cultures et des pâturages, pluie, terres cultivées, eau de surface,
+densité de population) et scores de risque. Il ne contient **aucun nom, aucun village, aucune
+description d'événement et aucune information ethnique, religieuse ou linguistique**.
+
+### 3. Nos engagements et comment le logiciel les respecte
+| Engagement | Comment il est garanti |
+|---|---|
+| Aucune information sur des caractéristiques protégées | `check_feature_sets` (dans `chadrisk/experiment.py`) bloque l'entraînement si une variable décrit l'ethnie, la religion, la langue ou les acteurs du conflit |
+| Aucune information du futur dans les prévisions | la même fonction refuse toute colonne de résultat comme variable ; des tests vérifient la date de chaque variable |
+| Seules des données agrégées sont publiées | `RiskRepository` ne stocke que des tables par département ; les fichiers ACLED bruts sont exclus par `.gitignore` |
+| Aucun suivi des visiteurs | ni formulaire ni mesure d'audience dans le code ; statistiques Streamlit désactivées |
+| Honnêteté sur l'incertitude | intervalles de confiance et limites sur la page *Résultats* ; les scores sont des rangs, pas des probabilités |
+| Accessibilité | anglais et français ; choix de la langue dans la page (pas dans un menu latéral caché sur téléphone) ; carte allégée pour les connexions lentes |
+
+### 4. Conditions d'utilisation
+- **Aide à la décision uniquement.** Le classement aide à décider où concentrer la prévention.
+  Il doit être combiné avec la connaissance locale et ne jamais déclencher seul une action.
+- **Utilisations interdites :** cibler, profiler ou surveiller une communauté ; relier les scores
+  à des informations ethniques ou religieuses ; décisions automatiques sur des personnes, des
+  terres, des mouvements de troupeaux ou des déploiements de sécurité ; prédire des incidents,
+  villages ou dates précis ; utilisation hors du sud du Tchad sans nouvelle validation ;
+  publication des cartes comme « cartes du danger ».
+- **Aucune garantie.** Peu de conflits sont enregistrés chaque trimestre et les médias en
+  manquent certains : les scores peuvent se tromper dans les deux sens. L'auteur décline toute
+  responsabilité pour les décisions prises sur la base de ce prototype.
+- **Usage non commercial**, comme l'exige la licence ACLED.
+
+### 5. Sources de données et licences
+| Source | Licence / conditions |
+|---|---|
+| Événements de conflit ACLED (classés par l'auteur) | Contrat de licence (EULA) et politique d'attribution d'ACLED ; données brutes non redistribuées |
+| Indice de végétation MODIS MOD13Q1 (NASA) | aucune restriction d'utilisation ou de redistribution |
+| Pluie CHIRPS (Climate Hazards Center, UCSB) | domaine public |
+| ESA WorldCover 2021 | CC BY 4.0 |
+| JRC Global Surface Water | programme Copernicus, utilisation libre avec mention |
+| Population WorldPop 2020 | CC BY 4.0 |
+| Limites administratives : geoBoundaries / OCHA Tchad | CC BY 3.0 IGO |
+| Fond de carte : OpenStreetMap | ODbL 1.0, © contributeurs OpenStreetMap |
+
+### 6. Cadre juridique
+Conçu pour respecter la loi tchadienne n° 007/PR/2015 portant protection des données à
+caractère personnel, la loi rwandaise n° 058/2021 relative à la protection des données à
+caractère personnel et de la vie privée (l'ALU est basée à Kigali) et la Convention de l'Union
+africaine sur la cybersécurité et la protection des données à caractère personnel (Malabo, 2014).
+
+### 7. Modifications et contact
+Toute modification de cette politique sera datée ci-dessus. Questions, corrections ou demandes
+de retrait de contenu : s.payang@alustudent.com.
+""",
+}
+
 DIRECTION = {
     "en": {True: "higher values → higher risk", False: "lower values → higher risk"},
     "fr": {True: "valeurs plus élevées → risque plus élevé",
@@ -250,6 +403,10 @@ class Translator:
     def findings(self, **values) -> str:
         """Answers to the research question, filled with the current results."""
         return FINDINGS[self.language].format(**values)
+
+    def privacy(self) -> str:
+        """Privacy policy and terms of use."""
+        return PRIVACY[self.language]
 
     def direction(self, increases: bool) -> str:
         """How a feature relates to risk, e.g. "lower values → higher risk"."""

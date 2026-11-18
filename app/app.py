@@ -1,7 +1,8 @@
 """
 Early warning of farmer-herder conflict risk in southern Chad — Streamlit dashboard.
 
-Tabs: Current outlook · Replay 2024-2025 · Findings · Observed conflicts · About the models.
+Pages: Current outlook · Replay 2024-2025 · Findings · Observed conflicts · About the models ·
+Privacy & terms.
 Data come from the SQLite database through chadrisk.storage.RiskRepository and from the result
 files in reports/. Texts are in app/i18n.py (English / French), building blocks in
 app/components.py.
@@ -77,6 +78,7 @@ def tab_outlook(t, depts, forecast, explanations, meta, data_end):
     with left:
         department_map(frame, "risk_score", t("legend_risk"),
                        (t("dept_select"), "Province"), key="now")
+        st.caption(t("map_source"))
     with right:
         st.dataframe(frame[["rank", "department", "province", "level", "risk_score"]]
                      .rename(columns={"rank": t("rank"), "department": t("department"),
@@ -149,6 +151,7 @@ def tab_replay(t, depts, panel, replay):
     with left:
         department_map(frame, "risk_score", t("legend_risk"),
                        (t("dept_select"), "Province"), key="replay")
+        st.caption(t("map_source"))
     with right:
         st.dataframe(frame[["rank", "department", "province", "level", "observed"]]
                      .rename(columns={"rank": t("rank"), "department": t("department"),
@@ -219,6 +222,7 @@ def tab_observed(t, depts, panel, data_end):
     with left:
         department_map(by_dept, col, t("obs_legend"), (t("dept_select"), "Province"),
                        key="obs")
+        st.caption(t("map_source"))
     with right:
         st.bar_chart(sub.groupby("ym")[col].sum())
         st.dataframe(by_dept.sort_values(col, ascending=False)[
@@ -253,6 +257,10 @@ def tab_about(t):
             st.image(str(REPORTS / "figures" / name), caption=title)
 
 
+def tab_privacy(t):
+    st.markdown(t.privacy())
+
+
 # ---------------- page ----------------
 def main():
     st.set_page_config(page_title="Farmer-Herder Conflict Risk - Southern Chad", layout="wide")
@@ -281,7 +289,7 @@ def main():
         st.caption(t("caption", sat=t.month(meta["satellite_data_end"], long=True),
                      conf=t.month(data_end, long=True)))
 
-    # Only the selected page is computed (Streamlit tabs would compute all five, and their
+    # Only the selected page is computed (Streamlit tabs would compute all six, and their
     # three maps, at every interaction).
     pages = t("tabs")
     # the page is stored as a number, so it survives a change of language
@@ -296,8 +304,10 @@ def main():
         tab_findings(t)
     elif page == 3:
         tab_observed(t, depts, panel, data_end)
-    else:
+    elif page == 4:
         tab_about(t)
+    else:
+        tab_privacy(t)
     st.caption(t("ethics"))
 
 

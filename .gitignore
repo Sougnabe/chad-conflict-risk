@@ -17,3 +17,6 @@ __pycache__/
 .venv/
 .ipynb_checkpoints/
 .pytest_cache/
+
+# Ethics assignment: personal documents (REC letter, drafts)
+docs/ethics/

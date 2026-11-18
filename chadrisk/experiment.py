@@ -10,18 +10,39 @@ Temporal protocol: model selection on 2019-2023 (rolling origin), single evaluat
 2024 - 2025-09, never used for tuning.
 """
 
+import re
 from dataclasses import dataclass, field
 
 import pandas as pd
 
-from chadrisk.config import (N_DEPARTMENTS, OUTCOME_COLUMNS, STUDY_START_YEAR,
-                             TEST_START_YEAR, VALIDATION_YEARS)
+from chadrisk.config import (N_DEPARTMENTS, OUTCOME_COLUMNS, SENSITIVE_TERMS,
+                             STUDY_START_YEAR, TEST_START_YEAR, VALIDATION_YEARS)
 from chadrisk.evaluation import Evaluator, PriorityTiers, RollingOriginSelector
 from chadrisk.models import FAMILIES, HistoryRuleModel, LogisticRiskModel, RiskModel
 
 MODES = ("research", "operational")
 UNITS = ("month", "quarter")
 SEASON = ["h_month_sin", "h_month_cos"]
+
+
+def check_feature_sets(sets: dict[str, list[str]]) -> None:
+    """Refuses a feature set that leaks the outcome or describes a protected characteristic.
+
+    Leakage guard: no column describing the predicted period may be a feature.
+    Ethics guard: no column about ethnicity, religion, language or conflict actors may be a
+    feature (actor names in ACLED often carry an ethnic label), so the model cannot learn to
+    associate risk with a community.
+    """
+    for name, columns in sets.items():
+        leaked = OUTCOME_COLUMNS & set(columns)
+        if leaked:
+            raise ValueError(f"outcome columns used as features in set {name}: {leaked}")
+        sensitive = [c for c in columns  # word by word: "factor" is not "actor"
+                     if any(word.startswith(SENSITIVE_TERMS)
+                            for word in re.split(r"[^a-z]+", c.lower()))]
+        if sensitive:
+            raise ValueError(f"protected characteristic used as a feature in set {name}: "
+                             f"{sensitive}")
 
 
 @dataclass(frozen=True)
@@ -112,10 +133,7 @@ class Experiment:
             sets = {"OA": o}
             if south or north:
                 sets["OB"] = o + south + north
-        for name, columns in sets.items():  # leakage guard
-            leaked = OUTCOME_COLUMNS & set(columns)
-            if leaked:
-                raise ValueError(f"outcome columns used as features in set {name}: {leaked}")
+        check_feature_sets(sets)
         return sets
 
     def baseline(self) -> HistoryRuleModel:

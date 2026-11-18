@@ -166,7 +166,7 @@ from streamlit.testing.v1 import AppTest  # noqa: E402
 
 APP = str(ROOT / "app" / "app.py")
 PAGES_EN = ["Current outlook", "Replay 2024–2025", "Findings", "Observed conflicts",
-            "About the models"]
+            "About the models", "Privacy & terms"]
 
 
 @pytest.fixture
@@ -194,6 +194,21 @@ def test_findings_page_reads_the_results(app):
     app.radio(key="page").set_value(PAGES_EN.index("Findings")).run()
     text = " ".join(m.value for m in app.markdown)
     assert "Research question" in text and "0.214" in text
+
+
+@pytest.mark.parametrize("language, title", [("English", "Privacy policy"),
+                                             ("Français", "Politique de confidentialité")])
+def test_privacy_page_states_the_promises(app, language, title):
+    app.radio(key="language").set_value(language).run()
+    app.radio(key="page").set_value(PAGES_EN.index("Privacy & terms")).run()
+    text = " ".join(m.value for m in app.markdown)
+    assert not app.exception
+    assert title in text and "SEPT26-BSE-087" in text and "check_feature_sets" in text
+
+
+def test_usage_statistics_are_disabled():
+    config = (ROOT / ".streamlit" / "config.toml").read_text("utf8")
+    assert "gatherUsageStats = false" in config
 
 
 def test_every_department_has_an_explanation(app):

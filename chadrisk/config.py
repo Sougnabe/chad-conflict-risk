@@ -90,6 +90,11 @@ ACLED_DELAY_MONTHS = 12
 OUTCOME_COLUMNS = frozenset({"n_fh", "n_broad", "n_all_events", "fatalities_fh", "y_fh",
                              "y_broad"})
 
+# Protected characteristics (Chad Law 007/PR/2015 art. 16; Malabo Convention art. 14): no
+# feature may describe them, so that the scores can never profile a community
+SENSITIVE_TERMS = ("ethnic", "ethnie", "tribe", "tribal", "clan", "religio", "race", "racial",
+                   "language", "langue", "caste", "nationality", "actor")
+
 # Keyword filter used only to compare with the manual classification
 KEYWORDS = (r"herder|herdsm|pastoral|cattle|livestock|transhuman|nomad|grazing|"
             r"farmer|crop|field|farm|camel|cow|oxen|herd")

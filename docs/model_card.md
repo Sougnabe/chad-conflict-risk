@@ -93,6 +93,10 @@ should be interpreted together, not individually.
 
 ## Ethical considerations
 - Aggregated department-level outputs only; no personal, ethnic or religious data.
+- Enforced in code: `check_feature_sets` (`chadrisk/experiment.py`) stops training if a
+  feature describes ethnicity, religion, language or conflict actors.
+- The dashboard collects nothing about its visitors; its *Privacy & terms* page states the
+  promises, prohibited uses and data licences.
 - Risk rankings can stigmatise areas or communities if communicated carelessly. They should be
   shared with organisations working on prevention, with this card, and not published as
   "danger maps".
