@@ -8,7 +8,7 @@ Steps:
 
 Conflict data (ACLED) are not refreshed here: new events must first be classified with the
 codebook (docs/labeling_codebook.md) before they can be used. Refreshing them is a separate,
-periodic step (download_acled.py, manual labelling, build_target.py, build_panel.py, init_db.py).
+periodic step (download_acled.py, classification with the codebook, build_target.py, build_panel.py, init_db.py).
 
 Usage: python scripts/update_outlook.py
 """

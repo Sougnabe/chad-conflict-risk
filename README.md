@@ -17,8 +17,9 @@ farmer-herder conflict**, so that humanitarian organisations, local authorities 
 committees can focus prevention before violence happens.
 
 It combines:
-- a **new, validated dataset** of farmer-herder conflict events: all 1,593 ACLED events for Chad
-  (2015–2025) classified with a written codebook, blind validation Cohen's kappa = 0.83;
+- a **new dataset** of farmer-herder conflict events: all 1,593 ACLED events for Chad
+  (2015–2025) classified with an AI assistant and a written codebook, validated by the author on a
+  blind 60-event sample (Cohen's kappa = 0.83);
 - **satellite indicators** from Google Earth Engine: crop greenness (MODIS NDVI), rainfall
   (CHIRPS), pasture conditions in the herds' northern departure zones, cropland, surface water,
   population;
@@ -157,17 +158,77 @@ On Streamlit Community Cloud: main file `app/app.py` (dependencies from `app/req
 The deployed app reads only `data/app.db` and `reports/`, which hold aggregated data. The
 database path can be changed with the environment variable `CHADRISK_DB`.
 
-## Data and ethics
+## Ethics
 
-- Raw ACLED data and any file containing event notes are not redistributed (licence); they are
-  excluded by `.gitignore`.
-- Outputs are aggregated at department level; no ethnic or religious variable is used, and
-  `check_feature_sets` (`chadrisk/experiment.py`) stops training if a feature describes ethnicity,
-  religion, language or conflict actors.
-- The dashboard collects nothing about its visitors (no forms, no analytics; Streamlit usage
-  statistics are disabled). Its *Privacy & terms* page states these promises, the prohibited
-  uses and the data licences; every map cites ACLED, as its Attribution Policy requires.
-- The dashboard supports human decisions; it does not make them. Intended and prohibited uses:
-  `docs/model_card.md`.
-- AI tools were used for coding assistance and for a first-pass event classification; every
-  label used as ground truth was checked against a blind human validation.
+- **Approval.** ALU Research Ethics Committee, approval code **SEPT26-BSE-087**
+  (5 November 2026, valid 6 months). Conditions: informed consent, information on purpose and
+  data use, anonymity and confidentiality, no coercion or payment, any change of procedure
+  reported to the REC within 48 hours.
+- **Who is involved, and status.** The model uses only secondary data (ACLED events, public
+  satellite data) and no information about identifiable people. The only research with people is
+  an anonymous practitioner questionnaire (`docs/practitioner_feedback_form.md`). **It has not been
+  sent yet: no participant data have been collected and no user testing with participants has
+  taken place.** A prototype of the dashboard was public from October 2026, before the approval;
+  it collected nothing from visitors and was not shown to any participant.
+- **Consent.** The first section of the questionnaire explains purpose, anonymity, voluntary
+  participation, withdrawal, data use and storage, with researcher and REC contacts; a required
+  "I agree" question must be accepted before the other questions. No name, email, organisation or
+  location is recorded; answers are deleted at the end of the project.
+- **Protected characteristics.** No ethnic, religious, language or actor variable is used:
+  `check_feature_sets` (`chadrisk/experiment.py`) stops training if a feature describes one of
+  them (8 unit tests in `tests/unit/test_ethics.py`). Outputs are aggregated for the 26
+  departments: no villages, names or event descriptions.
+- **Honest scores.** Departments are shown in two priority levels with their measured meaning
+  (Priority: conflict in 20% of quarters in 2024–2025; Lower: 5%), never as exact probabilities;
+  a permanent warning says scores support, not replace, local judgement.
+- **No tracking.** The dashboard collects nothing about its visitors (no forms, no analytics;
+  Streamlit usage statistics are disabled in `.streamlit/config.toml`). Credentials stay in
+  `.env`, which is excluded from git.
+- **Privacy & Terms page** (in the app): transparency notice, single declared purpose (prevention
+  planning, decision support only), prohibited uses (targeting, profiling or policing communities,
+  automated decisions, "danger maps"…) and data licences. Every map cites ACLED.
+- **Frameworks.** Designed against Chad's Law n° 007/PR/2015 on personal data protection (binding
+  in Chad), Rwanda's Law n° 058/2021 (binding where ALU is based and where the questionnaire
+  answers are processed), the African Union Malabo Convention (binding on Rwanda; guidance for
+  Chad, which signed but has not ratified), the UNESCO Recommendation on the Ethics of AI and the
+  ACM Code of Ethics (guidance).
+- **Known limitations.** The guard checks feature names, not hidden proxies; ACLED reporting bias
+  cannot be corrected without field data; practitioner validation is still to come; no Arabic
+  version; the map takes about 33 s to load on a low-end phone with slow 3G; herder and farmer
+  communities have not been consulted directly. See `docs/model_card.md`.
+
+## AI use
+
+The problem, the model concept (northern herds moving south in the dry season and reaching
+farmers' fields at planting and harvest) and all decisions are the author's. The author wrote the
+code (the `chadrisk` package, the dashboard and the tests) and used an AI assistant to clean it up
+(bug fixes, structure, additional tests). The labelling codebook and the classification of the
+1,593 ACLED events were produced by an AI assistant following the author's instructions; the
+author labelled a stratified sample of 60 events blind (Cohen's kappa = 0.83, farmer-herder vs.
+other) and added two codebook rules from the disagreements. The dashboard texts were drafted with
+an AI assistant and edited by the author.
+
+## Copyright and licences
+
+© 2026 Sougnabe Payang. **All rights reserved.** The repository is public so that it can be
+viewed under GitHub's terms, but it has no open-source licence: the code, codebook, labels and
+dashboard texts may not be reused without permission.
+
+Third-party components remain the property of their authors and are used under their licences:
+
+| Component | Licence | Use |
+|---|---|---|
+| pandas, NumPy, GeoPandas, Shapely, scikit-learn, joblib, python-dotenv, psutil, nbformat, nbconvert | BSD-3-Clause | unmodified dependencies (`requirements*.txt`) |
+| XGBoost, Streamlit, earthengine-api, requests, Playwright | Apache-2.0 | unmodified dependencies |
+| SHAP, folium, streamlit-folium, pytest | MIT | unmodified dependencies |
+| Matplotlib | Matplotlib License (PSF-based) | unmodified dependency |
+| Leaflet (map engine, via folium) | BSD-2-Clause | attribution on every map |
+| Google Earth Engine (service) | Google Earth Engine Terms of Service | non-commercial research account |
+| ACLED conflict events | ACLED End User License Agreement and Attribution Policy | non-commercial; raw data not redistributed (`.gitignore`), only department-level counts published; cited under every map |
+| MODIS MOD13Q1 v061 (NASA LP DAAC) | NASA data policy, no restrictions | cited |
+| CHIRPS rainfall (Climate Hazards Center, UCSB) | public domain | cited |
+| ESA WorldCover 2021 v200 | CC BY 4.0 | attribution on the Privacy page |
+| JRC Global Surface Water v1.4 | Copernicus data policy, acknowledgement required | cited |
+| WorldPop 100 m population 2020 | CC BY 4.0 | attribution on the Privacy page |
+| geoBoundaries / OCHA Chad boundaries | CC BY 3.0 IGO | attribution under every map |
+| OpenStreetMap background tiles | ODbL 1.0; OSMF Tile Usage Policy | "© OpenStreetMap contributors" on the map |

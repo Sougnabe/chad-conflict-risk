@@ -45,7 +45,7 @@ colors = ["#c0392b" if s else "#95a5a6" for s in by_prov["south"]]
 ax.barh(by_prov.index[::-1], by_prov["events"][::-1], color=colors[::-1])
 ax.set_xlabel("Number of events")
 ax.set_title("Farmer-herder conflict events by province, Chad 2015-2025\n"
-             "(red = southern provinces; source: ACLED, manually validated)")
+             "(red = southern provinces; source: ACLED, codebook labels)")
 plt.tight_layout()
 plt.savefig(FIG_DIR / "fh_by_province.png", dpi=150)
 plt.close()

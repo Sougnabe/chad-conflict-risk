@@ -19,11 +19,11 @@ TXT = {
              ["Perspectives actuelles", "Rejeu 2024–2025", "Résultats", "Conflits observés",
               "À propos des modèles", "Confidentialité et conditions"]),
     "map_source": ("Conflict data: ACLED (Armed Conflict Location & Event Data), "
-                   "[acleddata.com](https://acleddata.com), events classified by the author. "
+                   "[acleddata.com](https://acleddata.com), events classified for this project with an AI assistant. "
                    "Boundaries: geoBoundaries / OCHA Chad (CC BY 3.0 IGO). Background map: © "
                    "OpenStreetMap contributors.",
                    "Données de conflit : ACLED (Armed Conflict Location & Event Data), "
-                   "[acleddata.com](https://acleddata.com), événements classés par l'auteur. "
+                   "[acleddata.com](https://acleddata.com), événements classés pour ce projet avec un assistant IA. "
                    "Limites : geoBoundaries / OCHA Tchad (CC BY 3.0 IGO). Fond de carte : © "
                    "contributeurs OpenStreetMap."),
     "caption": ("Research prototype · satellite data up to **{sat}** · conflict data (ACLED, "
@@ -96,10 +96,12 @@ TXT = {
     "obs_deaths": ("Fatalities (strict FH)", "Décès (FH strict)"),
     "obs_dm": ("Department-months with ≥1 event", "Mois-départements avec ≥ 1 événement"),
     "obs_legend": ("Events in period", "Événements sur la période"),
-    "obs_caption": ("ACLED events manually classified as farmer-herder violence (blind "
-                    "validation: Cohen's kappa = 0.83), January 2019 – {end}.",
-                    "Événements ACLED classés manuellement comme violences agriculteurs-éleveurs"
-                    " (validation à l'aveugle : kappa de Cohen = 0,83), janvier 2019 – {end}."),
+    "obs_caption": ("ACLED events classified as farmer-herder violence with an AI assistant and a "
+                    "written codebook (blind validation on 60 events: Cohen's kappa = 0.83), "
+                    "January 2019 – {end}.",
+                    "Événements ACLED classés comme violences agriculteurs-éleveurs avec un "
+                    "assistant IA et un guide de codage écrit (validation à l'aveugle sur 60 "
+                    "événements : kappa de Cohen = 0,83), janvier 2019 – {end}."),
     "events": ("events", "événements"), "fatalities": ("fatalities", "décès"),
     "about": ("**Two models, two purposes.**\n\n"
               "- **Operational model** (*Current outlook*, *Replay*): uses only what is really "
@@ -221,7 +223,7 @@ visible ; le satellite voit les cultures sécher, pas la récolte elle-même.
 PRIVACY = {
     "en": """
 ## Privacy policy and terms of use
-*Version 1.0 · last updated 18 November 2026*
+*Version 1.1 · last updated 20 November 2026*
 
 This dashboard is a research prototype built by Sougnabe Payang for a BSc Software Engineering
 capstone project at African Leadership University (ALU). The research was approved by the ALU
@@ -270,7 +272,7 @@ information**.
 ### 5. Data sources and licences
 | Source | Licence / terms |
 |---|---|
-| ACLED conflict events (classified by the author) | ACLED End User License Agreement and Attribution Policy; raw data not redistributed |
+| ACLED conflict events (classified for this project with an AI assistant) | ACLED End User License Agreement and Attribution Policy; raw data not redistributed |
 | MODIS MOD13Q1 vegetation index (NASA) | no restrictions on use or redistribution |
 | CHIRPS rainfall (Climate Hazards Center, UCSB) | public domain |
 | ESA WorldCover 2021 | CC BY 4.0 |
@@ -282,7 +284,9 @@ information**.
 ### 6. Legal framework
 Designed to respect Chad's Law n° 007/PR/2015 on personal data protection, Rwanda's Law
 n° 058/2021 on the protection of personal data and privacy (ALU is based in Kigali) and the
-African Union Convention on Cyber Security and Personal Data Protection (Malabo, 2014).
+African Union Convention on Cyber Security and Personal Data Protection (Malabo, 2014). It also
+follows two non-binding guides: the UNESCO Recommendation on the Ethics of Artificial
+Intelligence (2021) and the ACM Code of Ethics and Professional Conduct (2018).
 
 ### 7. Changes and contact
 Any change to this policy will be dated above. Questions, corrections or requests to remove
@@ -290,7 +294,7 @@ content: s.payang@alustudent.com.
 """,
     "fr": """
 ## Politique de confidentialité et conditions d'utilisation
-*Version 1.0 · dernière mise à jour le 18 novembre 2026*
+*Version 1.1 · dernière mise à jour le 20 novembre 2026*
 
 Ce tableau de bord est un prototype de recherche réalisé par Sougnabe Payang dans le cadre d'un
 projet de fin d'études (BSc Software Engineering) à l'African Leadership University (ALU). La
@@ -342,7 +346,7 @@ description d'événement et aucune information ethnique, religieuse ou linguist
 ### 5. Sources de données et licences
 | Source | Licence / conditions |
 |---|---|
-| Événements de conflit ACLED (classés par l'auteur) | Contrat de licence (EULA) et politique d'attribution d'ACLED ; données brutes non redistribuées |
+| Événements de conflit ACLED (classés pour ce projet avec un assistant IA) | Contrat de licence (EULA) et politique d'attribution d'ACLED ; données brutes non redistribuées |
 | Indice de végétation MODIS MOD13Q1 (NASA) | aucune restriction d'utilisation ou de redistribution |
 | Pluie CHIRPS (Climate Hazards Center, UCSB) | domaine public |
 | ESA WorldCover 2021 | CC BY 4.0 |
@@ -356,6 +360,9 @@ Conçu pour respecter la loi tchadienne n° 007/PR/2015 portant protection des d
 caractère personnel, la loi rwandaise n° 058/2021 relative à la protection des données à
 caractère personnel et de la vie privée (l'ALU est basée à Kigali) et la Convention de l'Union
 africaine sur la cybersécurité et la protection des données à caractère personnel (Malabo, 2014).
+Il suit aussi deux guides non contraignants : la Recommandation de l'UNESCO sur l'éthique de
+l'intelligence artificielle (2021) et le Code d'éthique et de conduite professionnelle de l'ACM
+(2018).
 
 ### 7. Modifications et contact
 Toute modification de cette politique sera datée ci-dessus. Questions, corrections ou demandes

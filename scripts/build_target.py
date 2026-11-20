@@ -23,7 +23,7 @@ print(fh.groupby("admin1_norm").agg(events=("event_id_cnty", "size"),
       .sort_values("events", ascending=False).to_string())
 
 precision, recall = LabelledEvents.keyword_agreement(events)
-print(f"\nKeyword filter vs manual labels: precision {precision:.0%}, recall {recall:.0%}")
+print(f"\nKeyword filter vs codebook labels: precision {precision:.0%}, recall {recall:.0%}")
 
 # Blind validation sample: never overwrite one that has already been annotated
 if PATHS.validation_sample.exists():

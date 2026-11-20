@@ -3,6 +3,12 @@
 *To be shared with the dashboard link. Estimated time: 10 minutes. Responses are anonymous and
 used only for an undergraduate research project at African Leadership University.*
 
+> **Status (20 November 2026):** the questionnaire is set up in Google Forms with a required
+> consent question, but it **has not been sent yet**: no participant data have been collected and
+> no user testing with participants has taken place. It will be distributed only under ALU
+> Research Ethics Committee approval SEPT26-BSE-087 (5 November 2026, valid 6 months); any change
+> to this procedure is reported to the REC within 48 hours.
+
 ## Information and consent (must be accepted before the questions)
 
 **Purpose.** This questionnaire asks practitioners whether a dashboard that ranks the 26
@@ -14,7 +20,7 @@ Leadership University (ALU), approved by the ALU Research Ethics Committee
 **What you will do.** Look at the dashboard (https://chad-conflict-risk.streamlit.app/) and
 answer 12 questions. It takes about 10 minutes.
 
-**Anonymity.** The form does not ask for your name, email, organisation name or location, and
+**Anonymity.** The form does not ask for your name, email, organisation or location, and
 does not record email addresses. Do not write names of people or villages in your answers.
 Answers are reported only in grouped form or as short anonymous quotes.
 
@@ -23,7 +29,7 @@ refusing has no consequence for you or your organisation. You may skip any quest
 any time.
 
 **Withdrawal.** Because no identity is recorded, a response cannot be linked to you after it is
-submitted. If you want to withdraw before submitting, simply close the form; nothing is saved.
+submitted, so it cannot be withdrawn then. If you want to withdraw before submitting, close the form; nothing is saved.
 
 **Data use and storage.** Answers are used only to evaluate the dashboard in the capstone
 report. They are kept in the researcher's ALU Google account, are not shared with third parties,
@@ -52,7 +58,7 @@ Research Ethics Committee, researchethics@alueducation.com.
 | 4 | The seasonal pattern shown matches my experience (sowing, harvest, transhumance). | ☐ | ☐ | ☐ | ☐ | ☐ |
 | 5 | The departments ranked as highest risk are plausible. | ☐ | ☐ | ☐ | ☐ | ☐ |
 | 6 | The dashboard is easy to understand without technical training. | ☐ | ☐ | ☐ | ☐ | ☐ |
-| 7 | A quarterly risk ranking would be useful for planning (e.g. prevention, mediation, patrols). | ☐ | ☐ | ☐ | ☐ | ☐ |
+| 7 | A quarterly risk ranking would be useful for planning (e.g. prevention, mediation, dialogue). | ☐ | ☐ | ☐ | ☐ | ☐ |
 
 ## Open questions
 8. Which department or period ranked by the dashboard surprised you, and why?

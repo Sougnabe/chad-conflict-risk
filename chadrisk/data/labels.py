@@ -1,6 +1,7 @@
 """Validated event labels and the farmer-herder target variable.
 
-Labels (see docs/labeling_codebook.md):
+Labels (see docs/labeling_codebook.md; events classified with an AI assistant following
+the codebook, checked on a blind 60-event sample labelled by the author):
     FH  direct violence between farmers and herders (model target)
     AMB communal / pastoral violence without explicit farmer-herder framing
     REL related but non-violent event (protest, arrests, reconciliation)
@@ -17,7 +18,7 @@ VALID_LABELS = ("FH", "AMB", "REL", "NO")
 
 
 class LabelledEvents:
-    """Joins raw ACLED events with the manual labels and derives the targets."""
+    """Joins raw ACLED events with the codebook labels and derives the targets."""
 
     def __init__(self, events: pd.DataFrame, labels: pd.DataFrame):
         self._validate_labels(labels)
@@ -55,7 +56,7 @@ class LabelledEvents:
 
     @staticmethod
     def keyword_agreement(df: pd.DataFrame) -> tuple[float, float]:
-        """Precision and recall of the keyword filter against the manual labels."""
+        """Precision and recall of the keyword filter against the codebook labels."""
         hits = df["keyword_hit"] & (df["target_fh"] == 1)
         return hits.sum() / df["keyword_hit"].sum(), hits.sum() / df["target_fh"].sum()
 

@@ -3,8 +3,10 @@
 *Format adapted from Mitchell et al. (2019), "Model Cards for Model Reporting".*
 
 ## Model details
-- **Developer:** undergraduate capstone project, BSc Software Engineering (Machine Learning),
-  African Leadership University, 2026.
+- **Developer:** Sougnabe Payang, undergraduate capstone project, BSc Software Engineering
+  (Machine Learning), African Leadership University, 2026. Supervisor: Emmanuel Adjei.
+- **Ethics approval:** ALU Research Ethics Committee, approval code SEPT26-BSE-087
+  (5 November 2026, valid 6 months).
 - **Model used by the dashboard:** logistic regression (`logreg_OB`, L2-regularised,
   class-weighted, standardised inputs), operational mode, quarterly horizon.
 - **Output:** for each of the 26 departments of southern Chad, a risk score for the coming
@@ -26,6 +28,7 @@
 - Targeting, profiling or policing any community. The model contains no ethnic or religious
   information, and its outputs must not be linked to such information.
 - Automated decisions about people, land, movements of herds or security deployments.
+- Publishing the maps or rankings as "danger maps" of areas or communities.
 - Use outside southern Chad, or with a different conflict definition, without re-validation.
 
 ## Inputs
@@ -41,14 +44,15 @@ Only information available when a forecast is issued:
 
 ## Training and evaluation data
 - **Target:** at least one farmer-herder violent event in a department during the quarter.
-  Events come from ACLED (1,593 events for Chad, 2015–2025), classified with a written codebook
-  (`docs/labeling_codebook.md`). A blind validation on 60 events gave Cohen's kappa = 0.83 for
-  the target class.
+  Events come from ACLED (1,593 events for Chad, 2015–2025), classified by an AI assistant with a
+  written codebook (`docs/labeling_codebook.md`). The author labelled a stratified sample of 60
+  events blind (without seeing the AI labels): Cohen's kappa = 0.83 for farmer-herder vs. other;
+  two codebook rules were added from the disagreements.
 - **Period:** model selection on 2019–2023 (rolling-origin validation); single evaluation on the
   held-out period 2024 – September 2025 (182 department-quarters, 20 with a conflict,
   prevalence 0.11).
 - **No look-ahead:** every feature uses only information available before the forecast period;
-  this is checked by automated tests (`tests/test_pipeline.py`).
+  this is checked by automated tests (`tests/integration/test_pipeline.py`).
 
 ## Performance (test period, quarterly)
 | Model | PR-AUC [95% CI] | ROC-AUC |
@@ -90,6 +94,14 @@ should be interpreted together, not individually.
   visible in the data; the satellite sees crops drying, not the harvest itself.
 - **Delay of conflict data:** with real-time conflict data, the research model (recent
   history) would also be available operationally.
+- **No validation by practitioners yet:** the practitioner questionnaire
+  (`docs/practitioner_feedback_form.md`) has not been sent; usefulness is not yet demonstrated.
+- **Proxies:** the protected-characteristic guard checks feature names, not hidden proxies;
+  population density or pasture conditions in the north may still be linked to where herders live.
+- **Access:** no Arabic version, although Arabic is an official language of Chad (an unchecked
+  machine translation of the risk warnings was judged worse than none); on a low-end phone with
+  slow 3G the map takes about 33 s to load; internet access is required; there is no SMS, radio
+  or audio channel for low-literacy users.
 
 ## Ethical considerations
 - Aggregated department-level outputs only; no personal, ethnic or religious data.
@@ -102,8 +114,11 @@ should be interpreted together, not individually.
   "danger maps".
 - Errors have costs both ways: a department wrongly ranked low may receive less attention.
   Rankings must be combined with local knowledge.
-- AI tools were used for coding assistance and the first-pass event classification; ground-truth
-  labels were checked through blind human validation.
+- Herder and farmer communities themselves have not been consulted directly.
+- **AI use:** the author wrote the code and used an AI assistant to clean it up (bug fixes,
+  structure, tests). The labelling codebook and the classification of all 1,593 events were
+  produced by an AI assistant following the author's instructions, and validated on a blind
+  60-event sample (see above), not event by event.
 
 ## Maintenance
 - **Satellite data:** monthly, with `python scripts/update_outlook.py` (about 3 weeks after the

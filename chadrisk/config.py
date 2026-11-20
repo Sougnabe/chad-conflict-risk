@@ -95,7 +95,7 @@ OUTCOME_COLUMNS = frozenset({"n_fh", "n_broad", "n_all_events", "fatalities_fh",
 SENSITIVE_TERMS = ("ethnic", "ethnie", "tribe", "tribal", "clan", "religio", "race", "racial",
                    "language", "langue", "caste", "nationality", "actor")
 
-# Keyword filter used only to compare with the manual classification
+# Keyword filter used only to compare with the codebook classification
 KEYWORDS = (r"herder|herdsm|pastoral|cattle|livestock|transhuman|nomad|grazing|"
             r"farmer|crop|field|farm|camel|cow|oxen|herd")
 

@@ -1,5 +1,10 @@
 # Labeling Codebook — Farmer-Herder Conflict Events (ACLED, Chad 2015–2025)
 
+*Authorship: this codebook and the classification of the 1,593 events were drafted for this project
+by an AI assistant, following the author's instructions. The author validated the classification
+blind on a 60-event sample and added decision rules 2 and 3 from the disagreements (see Procedure).
+The labels are therefore AI labels checked on a sample, not labels checked one by one.*
+
 ## Source
 ACLED event data for Chad, 1 January 2015 – 2 October 2025 (1,593 events), downloaded via the ACLED API
 with Research-tier access (12-month publication lag). Raw data are not redistributed (ACLED licence).
@@ -21,9 +26,9 @@ with Research-tier access (12-month publication lag). Raw data are not redistrib
 5. **Multi-day and duplicate events** are kept as coded by ACLED. The model target is binary at department-month level ("at least one FH event"), so duplicates do not inflate it.
 
 ## Procedure
-1. Every one of the 1,593 event notes was read and labeled (AI-assisted first pass, applying the rules above).
-2. A stratified validation sample of 60 events (30 FH, 15 AMB, 15 keyword-matching NO), with labels hidden, was independently labeled by the author.
-3. Agreement was measured with Cohen's kappa; disagreements were reviewed and resolved into decision rules 2 and 3.
+1. All 1,593 event notes were classified by an AI assistant applying the codebook, as instructed by the author.
+2. A stratified validation sample of 60 events (30 FH, 15 AMB, 15 keyword-matching NO), with labels hidden, was independently labeled by the author without seeing the AI labels.
+3. Agreement was measured with Cohen's kappa; the author reviewed the disagreements and added decision rules 2 and 3 to the codebook.
 
 ## Validation results (before rule refinement)
 
@@ -36,8 +41,8 @@ with Research-tier access (12-month publication lag). Raw data are not redistrib
 
 ## Comparison with keyword filtering
 A keyword filter on the notes (herder, pastoral, cattle, farmer, field, etc.) achieved 60% precision and 99% recall
-against the manual labels: it captures almost all true events but includes many false positives
-(Boko Haram cattle raids, refugee-camp attacks, state violence). Manual labeling was therefore necessary.
+against the codebook labels: it captures almost all true events but includes many false positives
+(Boko Haram cattle raids, refugee-camp attacks, state violence). Reading and classifying each event note against the codebook was therefore necessary.
 
 ## Final label counts
 FH = 154 (112 in the seven southern provinces, 73%), AMB = 80, REL = 25, NO = 1,334.
